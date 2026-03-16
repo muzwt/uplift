@@ -1442,14 +1442,7 @@ function loadAccountsTab(){
     }).join('');
   },e=>{el.innerHTML=`<div class="admin-empty">error: ${e.message}</div>`;});
 }
-  if(snap.empty){el.innerHTML='<div class="admin-empty">no accounts yet</div>';return;}
-  el.innerHTML=snap.docs.map(d=>{
-    const u=d.data();
-    const uid=d.id;
-    return`<div class="admin-card" id="acct-${uid}" style="margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--accent);">~${esc(u.username)}</div>
-        <div style="font-size:10px;color:var(--text-dim);">${u.createdAt?new Date(u.createdAt.toMillis()).toLocaleDateString():''}</div>
+
 window.changeUsername = async function(uid, oldName){
   const newName = document.getElementById(`uname-${uid}`).value.trim().toLowerCase();
   if(!newName||newName===oldName){showToast('no change');return;}
