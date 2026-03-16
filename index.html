@@ -286,7 +286,7 @@
         <div class="notif-panel" id="notifPanel">
           <div class="notif-header">
             <span class="notif-title">Notifications</span>
-            <button class="notif-clear" onclick="clearNotifications()">Mark all read</button>
+            <button class="notif-clear" onclick="event.stopPropagation();clearNotifications()">Mark all read</button>
           </div>
           <div id="notifList"><div class="notif-empty">no notifications yet</div></div>
         </div>
@@ -766,11 +766,11 @@ window.goToNotif = function(confId,notifId){
 };
 
 window.clearNotifications = function(){
-  notifications=notifications.map(n=>({...n,read:true}));
-  localStorage.setItem('notifications',JSON.stringify(notifications));
+  notifications=[];
+  localStorage.removeItem('notifications');
   updateNotifBadge();
-  renderNotifList();
-  showToast('all notifications marked as read');
+  document.getElementById('notifList').innerHTML='<div class="notif-empty">no notifications yet</div>';
+  document.getElementById('notifPanel').classList.remove('open');
 };
 
 function watchOwnedReplies(){
