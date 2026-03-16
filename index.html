@@ -40,7 +40,7 @@
   .notif-item-time{font-size:10px;color:var(--text-dim);}
   .notif-item-preview{font-size:12px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .notif-empty{padding:32px 16px;text-align:center;color:var(--text-dim);font-size:11px;letter-spacing:0.1em;}
-  header{padding:60px 0 40px;border-bottom:1px solid var(--border);margin-bottom:48px;display:flex;justify-content:space-between;align-items:flex-end;}
+  header{padding:60px 0 40px;border-bottom:1px solid var(--border);margin-bottom:48px;display:flex;justify-content:space-between;align-items:center;}
   .logo{font-family:"Syne",sans-serif;font-weight:800;font-size:2rem;letter-spacing:-0.03em;color:var(--accent);margin-bottom:6px;}
   .tagline{color:var(--text-muted);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;}
   .topic-banner{background:rgba(232,255,71,0.05);border:1px solid rgba(232,255,71,0.15);border-radius:12px;padding:12px 20px;margin-bottom:32px;display:none;align-items:center;gap:10px;}
@@ -443,7 +443,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const ADMIN_PASSWORD = "Oranges";
-let isAdmin = false;
+let isAdmin = sessionStorage.getItem('isAdmin')==='true';
 let allConfessions = [];
 let currentSort = 'new';
 
@@ -545,14 +545,32 @@ document.addEventListener('click', e=>{
 
 updateNotifBadge();
 
-let filterEnabled = localStorage.getItem('filterEnabled')==='true';
-let customWords = JSON.parse(localStorage.getItem('customWords')||'[]');
-let siteLocked = localStorage.getItem('siteLocked')==='true';
-let lockReason = localStorage.getItem('lockReason')||'This site is currently locked.';
-let approvalMode = localStorage.getItem('approvalMode')==='true';
-let autoDeleteDays = parseInt(localStorage.getItem('autoDeleteDays')||'0');
-let bannedNames = JSON.parse(localStorage.getItem('bannedNames')||'[]');
-let dailyTopic = localStorage.getItem('dailyTopic')||'';
+let filterEnabled = false;
+let customWords = [];
+let siteLocked = false;
+let lockReason = 'This site is currently locked.';
+let approvalMode = false;
+let autoDeleteDays = 0;
+let bannedNames = [];
+let dailyTopic = '';
+let slowmodeDelay = 30;
+let lastPostTime = 0;
+
+// Listen to ALL global site settings from Firebase
+onSnapshot(doc(db,'siteSettings','config'), snap => {
+  const d = snap.data() || {};
+  siteLocked = d.siteLocked || false;
+  lockReason = d.lockReason || 'This site is currently locked.';
+  approvalMode = d.approvalMode || false;
+  filterEnabled = d.filterEnabled || false;
+  customWords = d.customWords || [];
+  dailyTopic = d.dailyTopic || '';
+  autoDeleteDays = d.autoDeleteDays || 0;
+  bannedNames = d.bannedNames || [];
+  slowmodeDelay = d.slowmodeDelay ?? 30;
+  applyLockdown();
+  applyDailyTopic();
+});
 let lastPostTime = 0;
 
 // Daily topic
@@ -866,7 +884,7 @@ window.closePasswordModal=function(){document.getElementById('passwordModal').cl
 window.checkPassword=function(){
   if(document.getElementById('adminPassword').value===ADMIN_PASSWORD){
     document.getElementById('passwordModal').classList.remove('active');
-    isAdmin=true;applyLockdown();openAdmin();
+    isAdmin=true;sessionStorage.setItem('isAdmin','true');applyLockdown();openAdmin();
   }else{
     document.getElementById('passwordError').classList.add('show');
     document.getElementById('adminPassword').value='';
@@ -1008,41 +1026,33 @@ function renderBannedList(){
   </div>`).join('');
 }
 
-window.banNickname=function(){
+window.banNickname=async function(){
   const val=document.getElementById('banInput').value.trim().toLowerCase();
   if(!val)return;
   if(!bannedNames.includes(val))bannedNames.push(val);
-  localStorage.setItem('bannedNames',JSON.stringify(bannedNames));
+  await setDoc(doc(db,'siteSettings','config'),{bannedNames},{merge:true});
   document.getElementById('banInput').value='';
   renderBannedList();
   showToast(`~${val} banned`);
 };
 
-window.banFromCard=function(nick){
+window.banFromCard=async function(nick){
   const val=nick.toLowerCase();
   if(!bannedNames.includes(val))bannedNames.push(val);
-  localStorage.setItem('bannedNames',JSON.stringify(bannedNames));
+  await setDoc(doc(db,'siteSettings','config'),{bannedNames},{merge:true});
   renderBannedList();
   showToast(`~${val} banned`);
 };
 
-window.unbanNickname=function(name){
+window.unbanNickname=async function(name){
   bannedNames=bannedNames.filter(n=>n!==name);
-  localStorage.setItem('bannedNames',JSON.stringify(bannedNames));
+  await setDoc(doc(db,'siteSettings','config'),{bannedNames},{merge:true});
   renderBannedList();
   showToast(`~${name} unbanned`);
 };
 
 // Settings
 function loadSettingsUI(){
-  siteLocked = localStorage.getItem('siteLocked')==='true';
-  approvalMode = localStorage.getItem('approvalMode')==='true';
-  filterEnabled = localStorage.getItem('filterEnabled')==='true';
-  slowmodeDelay = parseInt(localStorage.getItem('slowmodeDelay')||'30');
-  autoDeleteDays = parseInt(localStorage.getItem('autoDeleteDays')||'0');
-  dailyTopic = localStorage.getItem('dailyTopic')||'';
-  customWords = JSON.parse(localStorage.getItem('customWords')||'[]');
-  lockReason = localStorage.getItem('lockReason')||'This site is currently locked.';
   document.getElementById('slowmodeSeconds').value=slowmodeDelay;
   document.getElementById('filterToggle').checked=filterEnabled;
   document.getElementById('filterStatus').textContent=filterEnabled?'on':'off';
@@ -1060,12 +1070,10 @@ function loadSettingsUI(){
   else{preset.value='custom';custom.style.display='';custom.value=lockReason;}
 }
 
-window.saveLockdown=function(){
+window.saveLockdown=async function(){
   siteLocked=document.getElementById('lockToggle').checked;
-  localStorage.setItem('siteLocked',siteLocked);
-  document.getElementById('lockStatus').textContent=siteLocked?'locked':'unlocked';
-  document.getElementById('lockStatus').style.color=siteLocked?'var(--red)':'var(--text-muted)';
-  applyLockdown();showToast(siteLocked?'site locked':'site unlocked');
+  await setDoc(doc(db,'siteSettings','config'),{siteLocked,lockReason,approvalMode},{merge:true});
+  showToast(siteLocked?'site locked for everyone':'site unlocked');
 };
 
 window.onPresetChange=function(){
@@ -1075,55 +1083,57 @@ window.onPresetChange=function(){
   if(val==='custom')custom.focus();
 };
 
-window.saveLockReason=function(){
+window.saveLockReason=async function(){
   const val=document.getElementById('lockReasonPreset').value;
   if(val==='custom')lockReason=document.getElementById('lockReasonCustom').value.trim()||lockReason;
   else if(val)lockReason=val;
-  localStorage.setItem('lockReason',lockReason);applyLockdown();showToast('lockdown reason saved');
+  await setDoc(doc(db,'siteSettings','config'),{siteLocked,lockReason,approvalMode},{merge:true});
+  showToast('lockdown reason saved');
 };
 
-window.saveApprovalMode=function(){
+window.saveApprovalMode=async function(){
   approvalMode=document.getElementById('approvalToggle').checked;
-  localStorage.setItem('approvalMode',approvalMode);
+  await setDoc(doc(db,'siteSettings','config'),{siteLocked,lockReason,approvalMode},{merge:true});
   document.getElementById('approvalStatus').textContent=approvalMode?'on':'off';
-  applyLockdown();showToast(`approval mode ${approvalMode?'on':'off'}`);
+  showToast(`approval mode ${approvalMode?'on':'off'}`);
 };
 
-window.saveAutoDelete=function(){
+window.saveAutoDelete=async function(){
   autoDeleteDays=parseInt(document.getElementById('autoDeleteDays').value)||0;
-  localStorage.setItem('autoDeleteDays',autoDeleteDays);
+  await setDoc(doc(db,'siteSettings','config'),{autoDeleteDays},{merge:true});
   showToast(autoDeleteDays?`posts older than ${autoDeleteDays}d will be removed`:'auto-delete disabled');
 };
 
-window.saveSlowmode=function(){
+window.saveSlowmode=async function(){
   slowmodeDelay=parseInt(document.getElementById('slowmodeSeconds').value)||0;
-  localStorage.setItem('slowmodeDelay',slowmodeDelay);showToast(`slowmode set to ${slowmodeDelay}s`);
+  await setDoc(doc(db,'siteSettings','config'),{slowmodeDelay},{merge:true});
+  showToast(`slowmode set to ${slowmodeDelay}s`);
 };
 
-window.saveFilterToggle=function(){
+window.saveFilterToggle=async function(){
   filterEnabled=document.getElementById('filterToggle').checked;
-  localStorage.setItem('filterEnabled',filterEnabled);
+  await setDoc(doc(db,'siteSettings','config'),{filterEnabled},{merge:true});
   document.getElementById('filterStatus').textContent=filterEnabled?'on':'off';
   showToast(`bad word filter ${filterEnabled?'enabled':'disabled'}`);
 };
 
-window.saveCustomWords=function(){
+window.saveCustomWords=async function(){
   const val=document.getElementById('customWords').value;
   customWords=val.split(',').map(w=>w.trim().toLowerCase()).filter(Boolean);
-  localStorage.setItem('customWords',JSON.stringify(customWords));
+  await setDoc(doc(db,'siteSettings','config'),{customWords},{merge:true});
   showToast(`${customWords.length} custom word${customWords.length!==1?'s':''} saved`);
 };
 
-window.saveDailyTopic=function(){
+window.saveDailyTopic=async function(){
   dailyTopic=document.getElementById('dailyTopic').value.trim();
-  localStorage.setItem('dailyTopic',dailyTopic);
+  await setDoc(doc(db,'siteSettings','config'),{dailyTopic},{merge:true});
   applyDailyTopic();
   showToast(dailyTopic?'banner set':'banner cleared');
 };
 
-window.clearDailyTopic=function(){
+window.clearDailyTopic=async function(){
   dailyTopic='';
-  localStorage.setItem('dailyTopic','');
+  await setDoc(doc(db,'siteSettings','config'),{dailyTopic:''},{merge:true});
   document.getElementById('dailyTopic').value='';
   applyDailyTopic();
   showToast('banner cleared');
