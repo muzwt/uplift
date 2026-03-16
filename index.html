@@ -345,7 +345,7 @@
     <div class="feed-line"></div>
     <div class="sort-tabs">
       <button class="sort-tab active" id="tab-new" onclick="setSort('new')">New</button>
-      <button class="sort-tab" id="tab-hot" onclick="setSort('hot')">Hot</button>
+      <button class="sort-tab" id="tab-hot" onclick="setSort('hot')">Top</button>
       <button class="sort-tab" id="tab-bookmarks" onclick="setSort('bookmarks')">Saved</button>
     </div>
   </div>
@@ -942,7 +942,11 @@ window.setSort = function(s){
 function renderSorted(){
   let list=[...allConfessions];
   if(currentSort==='bookmarks') list=list.filter(c=>bookmarks[c.id]);
-  if(currentSort==='hot') list.sort((a,b)=>((b.likes||0)+(b.replyCount||0)*2)-((a.likes||0)+(a.replyCount||0)*2));
+  if(currentSort==='hot'){
+    const weekAgo=Date.now()-7*86400000;
+    list=list.filter(c=>c.createdAt&&c.createdAt.toMillis()>weekAgo);
+    list.sort((a,b)=>((b.likes||0)+(b.replyCount||0)*2)-((a.likes||0)+(a.replyCount||0)*2));
+  }
   renderFeed(list);
 }
 
