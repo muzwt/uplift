@@ -402,6 +402,7 @@
       <button class="admin-tab" onclick="switchTab('all')">All posts</button>
       <button class="admin-tab" onclick="switchTab('log')">Activity log</button>
       <button class="admin-tab" onclick="switchTab('bans')">Bans</button>
+      <button class="admin-tab" onclick="switchTab('accounts')">Accounts</button>
       <button class="admin-tab" onclick="switchTab('settings')">Settings</button>
     </div>
     <div class="admin-section active" id="tab-reported"><div id="reported-list"><div class="admin-empty">loading...</div></div></div>
@@ -419,6 +420,9 @@
         <span style="font-size:10px;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;">Banned users</span>
       </div>
       <div id="bans-list"><div class="admin-empty">no banned users</div></div>
+    </div>
+    <div class="admin-section" id="tab-accounts">
+      <div id="accounts-list"><div class="admin-empty">loading...</div></div>
     </div>
     <div class="admin-section" id="tab-settings">
       <div class="admin-settings">
@@ -1171,12 +1175,13 @@ window.openAdmin=function(){document.getElementById('adminPanel').classList.add(
 window.closeAdmin=function(){document.getElementById('adminPanel').classList.remove('active');};
 
 window.switchTab=function(tab){
-  const tabs=['reported','pending','all','log','bans','settings'];
+  const tabs=['reported','pending','all','log','bans','accounts','settings'];
   document.querySelectorAll('.admin-tab').forEach((t,i)=>t.classList.toggle('active',tabs[i]===tab));
   tabs.forEach(t=>document.getElementById(`tab-${t}`).classList.toggle('active',t===tab));
   if(tab==='settings'){loadSettingsUI();renderBannedList();}
   else if(tab==='log')renderActivityLog();
   else if(tab==='bans')renderBansTab();
+  else if(tab==='accounts')loadAccountsTab();
   else loadAdminData();
 };
 
@@ -1371,6 +1376,70 @@ window.unbanAll=async function(index){
   await setDoc(doc(db,'siteSettings','config'),{bannedNames},{merge:true});
   renderBannedList();renderBansTab();
   showToast('ban removed');
+};
+
+// Accounts tab
+async function loadAccountsTab(){
+  const el=document.getElementById('accounts-list');
+  el.innerHTML='<div class="admin-empty">loading...</div>';
+  const snap=await getDocs(query(collection(db,'users'),orderBy('createdAt','asc')));
+  if(snap.empty){el.innerHTML='<div class="admin-empty">no accounts yet</div>';return;}
+  el.innerHTML=snap.docs.map(d=>{
+    const u=d.data();
+    const uid=d.id;
+    return`<div class="admin-card" id="acct-${uid}" style="margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--accent);">~${esc(u.username)}</div>
+        <div style="font-size:10px;color:var(--text-dim);">${u.createdAt?new Date(u.createdAt.toMillis()).toLocaleDateString():''}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
+        <div>
+          <div style="font-size:10px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">Username</div>
+          <div style="display:flex;gap:6px;">
+            <input type="text" id="uname-${uid}" value="${esc(u.username)}" class="settings-text-input" style="flex:1;" placeholder="new username">
+            <button class="settings-save" onclick="changeUsername('${uid}','${esc(u.username)}')">Save</button>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">Password</div>
+          <div style="display:flex;gap:6px;">
+            <input type="text" id="upwd-${uid}" placeholder="new password" class="settings-text-input" style="flex:1;">
+            <button class="settings-save" onclick="changePassword('${uid}')">Save</button>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="admin-btn admin-btn-delete" onclick="deleteAccount('${uid}','${esc(u.username)}')">Delete account</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.changeUsername = async function(uid, oldName){
+  const newName = document.getElementById(`uname-${uid}`).value.trim().toLowerCase();
+  if(!newName||newName===oldName){showToast('no change');return;}
+  if(!/^[a-z0-9_]+$/.test(newName)){showToast('letters, numbers and _ only');return;}
+  const existing=await getDocs(query(collection(db,'users'),where('username','==',newName)));
+  if(!existing.empty){showToast('username already taken');return;}
+  await updateDoc(doc(db,'users',uid),{username:newName});
+  showToast(`username changed to ~${newName}`);
+  loadAccountsTab();
+};
+
+window.changePassword = async function(uid){
+  const newPwd = document.getElementById(`upwd-${uid}`).value.trim();
+  if(!newPwd){showToast('enter a new password');return;}
+  if(newPwd.length<6){showToast('password must be 6+ characters');return;}
+  await updateDoc(doc(db,'users',uid),{password:hashPassword(newPwd)});
+  document.getElementById(`upwd-${uid}`).value='';
+  showToast('password updated');
+};
+
+window.deleteAccount = async function(uid, username){
+  if(!confirm(`Delete account ~${username}? This cannot be undone.`))return;
+  await deleteDoc(doc(db,'users',uid));
+  document.getElementById(`acct-${uid}`)?.remove();
+  showToast(`~${username} deleted`);
 };
 
 // Settings
