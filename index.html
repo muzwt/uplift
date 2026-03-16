@@ -773,11 +773,13 @@ window.clearNotifications = function(){
   document.getElementById('notifPanel').classList.remove('open');
 };
 
+let watchRepliesForConf = ()=>{};
+
 function watchOwnedReplies(){
   if(!currentUser) return;
   const watched = new Set();
 
-  function watchRepliesFor(confId){
+  watchRepliesForConf = function(confId){
     if(watched.has(confId)) return;
     watched.add(confId);
     onSnapshot(query(collection(db,'confessions',confId,'replies'),orderBy('createdAt','asc')),rSnap=>{
@@ -794,15 +796,24 @@ function watchOwnedReplies(){
       seenReplyCounts[confId]=count;
       localStorage.setItem('seenReplyCounts',JSON.stringify(seenReplyCounts));
     });
-  }
+  };
 
-  // Watch ALL confessions and filter client-side — no index needed
+  // Watch posts you authored
   onSnapshot(query(collection(db,'confessions'),orderBy('createdAt','desc')),snap=>{
     snap.docs.forEach(d=>{
       const data=d.data();
-      if(data.realUsername===currentUser.username || data.nickname===currentUser.username){
-        watchRepliesFor(d.id);
+      if(data.realUsername===currentUser.username||data.nickname===currentUser.username){
+        watchRepliesForConf(d.id);
       }
+    });
+  });
+
+  // Watch posts you've replied to
+  onSnapshot(query(collection(db,'confessions'),orderBy('createdAt','desc')),snap=>{
+    snap.docs.forEach(async d=>{
+      if(watched.has(d.id)) return;
+      const repliesSnap=await getDocs(query(collection(db,'confessions',d.id,'replies'),where('realUsername','==',currentUser.username)));
+      if(!repliesSnap.empty) watchRepliesForConf(d.id);
     });
   });
 }
@@ -1068,6 +1079,8 @@ window.submitReply = async function(confId){
   input.value='';
   await addDoc(collection(db,'confessions',confId,'replies'),{nickname:nick,realUsername:currentUser.username,text,isAdmin,createdAt:serverTimestamp()});
   await updateDoc(doc(db,'confessions',confId),{replyCount:increment(1)});
+  // Start watching this confession for future replies
+  watchRepliesForConf(confId);
 };
 
 // ── EDIT/DELETE OWN ───────────────────────────────────────────
