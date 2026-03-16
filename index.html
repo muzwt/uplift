@@ -25,7 +25,6 @@
   .tagline{color:var(--text-muted);font-size:11px;letter-spacing:0.15em;text-transform:uppercase;}
   .topic-banner{background:var(--accent-dim);border:1px solid rgba(157,127,212,0.2);border-radius:2px;padding:12px 20px;margin-bottom:32px;display:none;align-items:center;gap:10px;}
   .topic-banner.active{display:flex;}
-  .topic-label{font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);flex-shrink:0;}
   .topic-text{font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;color:var(--text);}
   .locked-banner{background:rgba(196,85,106,0.08);border:1px solid rgba(196,85,106,0.25);border-radius:2px;padding:14px 20px;margin-bottom:32px;display:none;align-items:center;gap:12px;}
   .locked-banner.active{display:flex;}
@@ -222,7 +221,6 @@
   </header>
 
   <div class="topic-banner" id="topicBanner">
-    <span class="topic-label">Today's topic</span>
     <span class="topic-text" id="topicText"></span>
   </div>
 
@@ -302,11 +300,11 @@
     <div class="admin-section" id="tab-settings">
       <div class="admin-settings">
         <div class="settings-row">
-          <div><div class="settings-label">Daily topic</div><div class="settings-desc">Show a prompt above the confession form</div></div>
+          <div><div class="settings-label">Site banner</div><div class="settings-desc">Show a message banner above the post form</div></div>
           <div class="settings-control" style="flex-direction:column;align-items:flex-end;gap:8px;">
-            <input type="text" id="dailyTopic" placeholder="e.g. What's your biggest regret?" maxlength="120" class="settings-text-input" onfocus="this.style.borderColor='var(--admin)'" onblur="this.style.borderColor='var(--border)'">
+            <input type="text" id="dailyTopic" placeholder="e.g. Today's topic, announcements..." maxlength="120" class="settings-text-input" onfocus="this.style.borderColor='var(--admin)'" onblur="this.style.borderColor='var(--border)'">
             <div style="display:flex;gap:8px;">
-              <button class="settings-save" onclick="saveDailyTopic()">Set topic</button>
+              <button class="settings-save" onclick="saveDailyTopic()">Set banner</button>
               <button class="admin-btn-clear admin-btn" onclick="clearDailyTopic()" style="font-size:10px;padding:6px 14px;">Clear</button>
             </div>
           </div>
@@ -859,7 +857,6 @@ function renderActivityLog(){
   if(!activityLog.length){el.innerHTML='<div class="log-empty">no activity yet</div>';return;}
   el.innerHTML=activityLog.map(e=>`
     <div class="log-entry">
-      <div class="log-icon ${e.type}">${e.type==='edit'?'✎':'✕'}</div>
       <div class="log-body">
         <div class="log-action"><strong>~${esc(e.nickname)}</strong> ${e.type==='edit'?'edited':'deleted'} their confession</div>
         <div class="log-preview">"${esc(e.text)}${e.text.length>=120?'…':''}"</div>
@@ -980,7 +977,7 @@ window.saveDailyTopic=function(){
   dailyTopic=document.getElementById('dailyTopic').value.trim();
   localStorage.setItem('dailyTopic',dailyTopic);
   applyDailyTopic();
-  showToast(dailyTopic?'daily topic set':'topic cleared');
+  showToast(dailyTopic?'banner set':'banner cleared');
 };
 
 window.clearDailyTopic=function(){
@@ -988,7 +985,7 @@ window.clearDailyTopic=function(){
   localStorage.setItem('dailyTopic','');
   document.getElementById('dailyTopic').value='';
   applyDailyTopic();
-  showToast('topic cleared');
+  showToast('banner cleared');
 };
 
 function showToast(msg){
