@@ -126,7 +126,7 @@
   .reply-nick{color:var(--accent);font-family:"Syne",sans-serif;font-weight:700;font-size:10px;display:flex;align-items:center;gap:4px;}
   .reply-time{color:var(--text-dim);font-size:10px;}
   .reply-text{font-size:13px;line-height:1.65;color:var(--text);opacity:0.8;}
-  .reply-form{padding:14px 24px;display:flex;gap:10px;align-items:flex-start;border-top:1px solid var(--border);background:var(--bg2);}
+  .reply-form{padding:14px 24px;display:flex;gap:10px;align-items:flex-start;border-top:1px solid var(--border);background:var(--bg2);border-radius:0 0 16px 16px;}
   .reply-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:"DM Mono",monospace;font-size:13px;padding:7px 12px;outline:none;transition:border-color 0.2s;}
   .reply-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(232,255,71,0.06);}
   .reply-input::placeholder{color:var(--text-dim);}
@@ -1026,6 +1026,14 @@ window.unbanNickname=function(name){
 
 // Settings
 function loadSettingsUI(){
+  siteLocked = localStorage.getItem('siteLocked')==='true';
+  approvalMode = localStorage.getItem('approvalMode')==='true';
+  filterEnabled = localStorage.getItem('filterEnabled')==='true';
+  slowmodeDelay = parseInt(localStorage.getItem('slowmodeDelay')||'30');
+  autoDeleteDays = parseInt(localStorage.getItem('autoDeleteDays')||'0');
+  dailyTopic = localStorage.getItem('dailyTopic')||'';
+  customWords = JSON.parse(localStorage.getItem('customWords')||'[]');
+  lockReason = localStorage.getItem('lockReason')||'This site is currently locked.';
   document.getElementById('slowmodeSeconds').value=slowmodeDelay;
   document.getElementById('filterToggle').checked=filterEnabled;
   document.getElementById('filterStatus').textContent=filterEnabled?'on':'off';
