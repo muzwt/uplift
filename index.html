@@ -1032,7 +1032,7 @@ window.submitConfession = async function(){
   const btn=document.getElementById('submitBtn');
   btn.disabled=true; btn.textContent='posting...';
   try{
-    const ref=await addDoc(collection(db,'confessions'),{nickname:nick,realUsername:currentUser.username,posterUsername:currentUser.username,text,likes:0,replyCount:0,reports:0,isAdmin,pending:approvalMode&&!isAdmin,browserId,createdAt:serverTimestamp()});
+    const ref=await addDoc(collection(db,'confessions'),{nickname:nick,realUsername:currentUser.username,posterUsername:currentUser.username,anonPost:anonMode,text,likes:0,replyCount:0,reports:0,isAdmin,pending:approvalMode&&!isAdmin,browserId,createdAt:serverTimestamp()});
     myTokens[ref.id]=token;
     localStorage.setItem('myTokens',JSON.stringify(myTokens));
     localStorage.setItem('myNick',nick);
@@ -1092,14 +1092,15 @@ window.submitReply = async function(confId){
   if(siteLocked&&!isAdmin){showToast('site is locked');return;}
   if(!currentUser){showAuthScreen();return;}
   if(!isAdmin&&bannedNames.some(b=>(b.name||b)===(currentUser.username||'').toLowerCase())){showToast('you are banned');return;}
-  const nick=anonMode?'anonymous':filterText(currentUser.username);
+  const conf=allConfessions.find(c=>c.id===confId);
+  const forceAnon=conf&&conf.anonPost&&conf.realUsername===currentUser.username;
+  const nick=(anonMode||forceAnon)?'anonymous':filterText(currentUser.username);
   const input=document.getElementById(`reply-input-${confId}`);
   const rawText=input.value.trim(); if(!rawText) return;
   const text=filterText(rawText);
   input.value='';
   await addDoc(collection(db,'confessions',confId,'replies'),{nickname:nick,realUsername:currentUser.username,text,isAdmin,createdAt:serverTimestamp()});
   await updateDoc(doc(db,'confessions',confId),{replyCount:increment(1)});
-  // Start watching this confession for future replies
   watchRepliesForConf(confId);
 };
 
