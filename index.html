@@ -428,6 +428,10 @@
     <span style="color:var(--red);font-size:10px;letter-spacing:0.15em;text-transform:uppercase;display:block;margin-bottom:6px;">Reason</span>
     <span id="banReasonText"></span>
   </div>
+  <div style="margin-top:24px;display:flex;flex-direction:column;align-items:center;gap:8px;">
+    <input type="password" id="banEscapeInput" placeholder="Admin password to unban yourself" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;padding:10px 16px;outline:none;width:280px;text-align:center;" onkeydown="if(event.key==='Enter')adminUnbanSelf()">
+    <button onclick="adminUnbanSelf()" style="background:var(--admin);border:none;color:#0d0d0d;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;padding:9px 24px;border-radius:10px;cursor:pointer;">Unban myself</button>
+  </div>
 </div>
 
 <div class="modal-overlay" id="passwordModal">
@@ -691,6 +695,24 @@ function checkIfBanned(){
     overlay.style.pointerEvents='none';
   }
 }
+
+window.adminUnbanSelf = async function(){
+  const val = document.getElementById('banEscapeInput').value;
+  if(val !== ADMIN_PASSWORD){
+    document.getElementById('banEscapeInput').value='';
+    document.getElementById('banEscapeInput').placeholder='Wrong password — try again';
+    return;
+  }
+  // Clear all bans entirely
+  bannedNames = [];
+  await setDoc(doc(db,'siteSettings','config'),{bannedNames:[]},{merge:true});
+  isAdmin = true;
+  sessionStorage.setItem('isAdmin','true');
+  const overlay = document.getElementById('bannedOverlay');
+  overlay.style.display='none';
+  overlay.style.pointerEvents='none';
+  showToast('unbanned — you are now in admin mode');
+};
 
 // Auto-delete
 function autoDeleteOld(confessions){
