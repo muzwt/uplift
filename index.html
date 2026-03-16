@@ -688,10 +688,6 @@ document.addEventListener('click',e=>{
   if(wrap&&!wrap.contains(e.target)) closeUserMenu();
 });
 
-// Show auth or apply UI on load
-if(currentUser){ applyUserUI(); } else { showAuthScreen(); }
-// ─────────────────────────────────────────────────────────────
-
 // Notifications
 function updateNotifBadge(){
   const unread = notifications.filter(n=>!n.read).length;
@@ -760,7 +756,7 @@ function watchOwnedReplies(){
         const newReplies = snap.docs.slice(prev);
         newReplies.forEach(d=>{
           const r = d.data();
-          if(r.sessionId !== sessionId){
+          if(!currentUser || r.nickname !== currentUser.username || anonMode){
             const conf = allConfessions.find(c=>c.id===confId);
             addNotification(confId, conf?.text||'', r.text||'', r.nickname||'anon');
           }
@@ -875,7 +871,7 @@ applyLockdown();
 
 // Check if current user is banned and show overlay
 function checkIfBanned(){
-  if(isAdmin)return;
+  if(isAdmin||!currentUser)return;
   const myNick=(localStorage.getItem('myNick')||'').toLowerCase();
   const overlay=document.getElementById('bannedOverlay');
   const entry=bannedNames.find(b=>b.browserId&&b.browserId===browserId);
@@ -924,6 +920,9 @@ function autoDeleteOld(confessions){
 }
 
 // timeAgo
+// Init auth UI after all functions defined
+function initAuth(){ if(currentUser){ applyUserUI(); } else { showAuthScreen(); } }
+
 function timeAgo(ts){
   if(!ts)return'just now';
   const s=Math.floor((Date.now()-ts.toMillis())/1000);
@@ -1006,6 +1005,7 @@ onSnapshot(query(collection(db,'confessions'),orderBy('createdAt','desc')),snap=
   renderSorted();
 });
 watchOwnedReplies();
+initAuth();
 
 // Submit
 window.submitConfession = async function(){
@@ -1115,8 +1115,7 @@ function loadReplies(confId){
     if(snap.empty){list.innerHTML='';return;}
     list.innerHTML=snap.docs.map(d=>{
       const r=d.data();
-      const myNick=currentUser?currentUser.username:'';
-      const isOP=confNick&&r.nickname&&r.nickname===confNick&&myTokens[confId];
+      const isOP=confNick&&r.nickname&&currentUser&&r.nickname===currentUser.username&&!anonMode&&myTokens[confId];
       return`<div class="reply-item"><div class="reply-meta"><span class="reply-nick">~${esc(r.nickname||'anon')}${isOP?'<span class="op-badge">OP</span>':''}</span><span class="reply-time">${timeAgo(r.createdAt)}</span></div><div class="reply-text">${esc(r.text)}</div></div>`;
     }).join('');
   });
@@ -1131,7 +1130,7 @@ window.submitReply = async function(confId){
   const rawText=input.value.trim();if(!rawText)return;
   const text=filterText(rawText);
   input.value='';
-  await addDoc(collection(db,'confessions',confId,'replies'),{nickname:nick,text,isAdmin,sessionId,createdAt:serverTimestamp()});
+  await addDoc(collection(db,'confessions',confId,'replies'),{nickname:nick,text,isAdmin,createdAt:serverTimestamp()});
   await updateDoc(doc(db,'confessions',confId),{replyCount:increment(1)});
 };
 
