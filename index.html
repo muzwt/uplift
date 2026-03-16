@@ -309,6 +309,7 @@
       <button class="admin-tab" onclick="switchTab('pending')">Pending</button>
       <button class="admin-tab" onclick="switchTab('all')">All posts</button>
       <button class="admin-tab" onclick="switchTab('log')">Activity log</button>
+      <button class="admin-tab" onclick="switchTab('bans')">Bans</button>
       <button class="admin-tab" onclick="switchTab('settings')">Settings</button>
     </div>
     <div class="admin-section active" id="tab-reported"><div id="reported-list"><div class="admin-empty">loading...</div></div></div>
@@ -320,6 +321,12 @@
         <button class="admin-btn-clear admin-btn" onclick="clearLog()" style="font-size:10px;padding:5px 12px;">Clear log</button>
       </div>
       <div id="activity-log-list"></div>
+    </div>
+    <div class="admin-section" id="tab-bans">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <span style="font-size:10px;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;">Banned users</span>
+      </div>
+      <div id="bans-list"><div class="admin-empty">no banned users</div></div>
     </div>
     <div class="admin-section" id="tab-settings">
       <div class="admin-settings">
@@ -477,6 +484,10 @@ let activityLog = JSON.parse(localStorage.getItem('activityLog')||'[]');
 let notifications = JSON.parse(localStorage.getItem('notifications')||'[]');
 let seenReplyCounts = JSON.parse(localStorage.getItem('seenReplyCounts')||'{}');
 
+// Persistent browser ID
+let browserId = localStorage.getItem('browserId');
+if(!browserId){ browserId = Math.random().toString(36).slice(2)+Date.now().toString(36); localStorage.setItem('browserId', browserId); }
+
 // Notifications
 function updateNotifBadge(){
   const unread = notifications.filter(n=>!n.read).length;
@@ -592,6 +603,7 @@ onSnapshot(doc(db,'siteSettings','config'), snap => {
   applyLockdown();
   applyDailyTopic();
   checkIfBanned();
+  renderBansTab();
 });
 
 // Daily topic
@@ -662,8 +674,11 @@ function checkIfBanned(){
   if(isAdmin)return;
   const myNick=(localStorage.getItem('myNick')||'').toLowerCase();
   const overlay=document.getElementById('bannedOverlay');
-  if(!myNick){overlay.style.display='none';overlay.style.pointerEvents='none';return;}
-  const entry=bannedNames.find(b=>(b.name||b)===myNick);
+  const entry=bannedNames.find(b=>{
+    const nameMatch=myNick&&(b.name||b)===myNick;
+    const browserMatch=b.browserId&&b.browserId===browserId;
+    return nameMatch||browserMatch;
+  });
   if(entry){
     overlay.style.display='flex';
     overlay.style.pointerEvents='all';
@@ -788,7 +803,7 @@ window.submitConfession = async function(){
   const btn=document.getElementById('submitBtn');
   btn.disabled=true;btn.textContent='posting...';
   try{
-    const ref=await addDoc(collection(db,'confessions'),{nickname:nick,text,likes:0,replyCount:0,reports:0,isAdmin,pending:approvalMode&&!isAdmin,createdAt:serverTimestamp()});
+    const ref=await addDoc(collection(db,'confessions'),{nickname:nick,text,likes:0,replyCount:0,reports:0,isAdmin,pending:approvalMode&&!isAdmin,browserId,createdAt:serverTimestamp()});
     myTokens[ref.id]=token;
     localStorage.setItem('myTokens',JSON.stringify(myTokens));
     localStorage.setItem('myNick',nick);
@@ -937,11 +952,12 @@ window.openAdmin=function(){document.getElementById('adminPanel').classList.add(
 window.closeAdmin=function(){document.getElementById('adminPanel').classList.remove('active');};
 
 window.switchTab=function(tab){
-  const tabs=['reported','pending','all','log','settings'];
+  const tabs=['reported','pending','all','log','bans','settings'];
   document.querySelectorAll('.admin-tab').forEach((t,i)=>t.classList.toggle('active',tabs[i]===tab));
   tabs.forEach(t=>document.getElementById(`tab-${t}`).classList.toggle('active',t===tab));
   if(tab==='settings'){loadSettingsUI();renderBannedList();}
   else if(tab==='log')renderActivityLog();
+  else if(tab==='bans')renderBansTab();
   else loadAdminData();
 };
 
@@ -980,7 +996,7 @@ async function renderAdminList(containerId,items,reportedOnly,pendingOnly){
         ${conf.pending?`<button class="admin-btn admin-btn-approve" onclick="approveConfession('${conf.id}')">Approve</button>`:''}
         <button class="admin-btn admin-btn-delete" onclick="deleteConfession('${conf.id}')">Delete</button>
         <button class="admin-btn admin-btn-pin" onclick="togglePin('${conf.id}',${!!conf.pinned})">${conf.pinned?'Unpin':'Pin'}</button>
-        <button class="admin-btn" style="background:var(--red-dim);border:1px solid rgba(255,80,80,0.3);color:var(--red);" onclick="openBanModal('${esc(conf.nickname||'anon')}')">Ban user</button>
+        <button class="admin-btn" style="background:var(--red-dim);border:1px solid rgba(255,80,80,0.3);color:var(--red);" onclick="openBanModal('${esc(conf.nickname||'anon')}','${conf.browserId||''}')">Ban user</button>
         ${(conf.reports||0)>0?`<button class="admin-btn admin-btn-clear" onclick="clearReports('${conf.id}')">Clear reports</button>`:''}
       </div>
       ${replies.length?`<div class="admin-replies">
@@ -1056,17 +1072,41 @@ window.clearLog=function(){
   showToast('log cleared');
 };
 
-// Banned names
+// Banned names — compact version for settings
 function renderBannedList(){
   const el=document.getElementById('banned-list');
   if(!el)return;
   if(!bannedNames.length){el.innerHTML='<div style="color:var(--text-dim);font-size:11px;padding:8px 0;">no banned names</div>';return;}
   el.innerHTML=bannedNames.map(b=>{
     const name=b.name||b;
-    const reason=b.reason||'';
-    return`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);gap:12px;">
-      <div><div style="color:var(--red);font-size:12px;">~${esc(name)}</div>${reason?`<div style="color:var(--text-dim);font-size:10px;margin-top:2px;">${esc(reason)}</div>`:''}</div>
+    return`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);gap:12px;">
+      <span style="color:var(--red);font-size:12px;">~${esc(name)}</span>
       <button class="admin-btn-delete-reply" onclick="unbanNickname('${esc(name)}')">Unban</button>
+    </div>`;
+  }).join('');
+}
+
+// Banned names — full panel for Bans tab
+function renderBansTab(){
+  const el=document.getElementById('bans-list');
+  if(!bannedNames.length){el.innerHTML='<div class="admin-empty">no banned users</div>';return;}
+  el.innerHTML=bannedNames.map((b,i)=>{
+    const name=b.name||b;
+    const reason=b.reason||'';
+    const bid=b.browserId||null;
+    return`<div class="admin-card" style="margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px;">
+        <div>
+          <div style="color:var(--red);font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:4px;">~${esc(name)}</div>
+          ${reason?`<div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">Reason: ${esc(reason)}</div>`:''}
+          ${bid?`<div style="font-size:10px;color:var(--text-dim);">Browser ID: ${bid.slice(0,12)}...</div>`:'<div style="font-size:10px;color:var(--text-dim);">No browser ID (nickname ban only)</div>'}
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="admin-btn admin-btn-clear" onclick="unbanNickname('${esc(name)}')">Unban nickname</button>
+        ${bid?`<button class="admin-btn admin-btn-clear" onclick="unbanBrowser('${bid}')">Unban browser</button>`:''}
+        <button class="admin-btn admin-btn-delete" onclick="unbanAll(${i})">Remove entirely</button>
+      </div>
     </div>`;
   }).join('');
 }
@@ -1082,8 +1122,8 @@ window.banNickname=async function(){
 };
 
 let banTarget = null;
-window.openBanModal = function(nick){
-  banTarget = nick;
+window.openBanModal = function(nick, confBrowserId){
+  banTarget = {nick, browserId: confBrowserId||null};
   document.getElementById('banReasonInput').value = '';
   document.getElementById('banReasonModal').classList.add('active');
   setTimeout(()=>document.getElementById('banReasonInput').focus(), 100);
@@ -1095,9 +1135,10 @@ window.closeBanModal = function(){
 window.confirmBan = async function(){
   if(!banTarget) return;
   const reason = document.getElementById('banReasonInput').value.trim();
-  const val = banTarget.toLowerCase();
+  const val = banTarget.nick.toLowerCase();
+  const bid = banTarget.browserId;
   bannedNames = bannedNames.filter(b=>(b.name||b)!==val);
-  bannedNames.push({name:val, reason});
+  bannedNames.push({name:val, reason, browserId:bid||null});
   await setDoc(doc(db,'siteSettings','config'),{bannedNames},{merge:true});
   closeBanModal();
   renderBannedList();
@@ -1105,10 +1146,30 @@ window.confirmBan = async function(){
 };
 
 window.unbanNickname=async function(name){
-  bannedNames=bannedNames.filter(b=>(b.name||b)!==name);
+  bannedNames=bannedNames.map(b=>{
+    if((b.name||b)===name) return b.browserId?{...b,name:null}:null;
+    return b;
+  }).filter(b=>b&&(b.name||b.browserId));
   await setDoc(doc(db,'siteSettings','config'),{bannedNames},{merge:true});
-  renderBannedList();
-  showToast(`~${name} unbanned`);
+  renderBannedList();renderBansTab();
+  showToast(`~${name} nickname unbanned`);
+};
+
+window.unbanBrowser=async function(bid){
+  bannedNames=bannedNames.map(b=>{
+    if(b.browserId===bid) return b.name?{...b,browserId:null}:null;
+    return b;
+  }).filter(b=>b&&(b.name||b.browserId));
+  await setDoc(doc(db,'siteSettings','config'),{bannedNames},{merge:true});
+  renderBannedList();renderBansTab();
+  showToast('browser unbanned');
+};
+
+window.unbanAll=async function(index){
+  bannedNames.splice(index,1);
+  await setDoc(doc(db,'siteSettings','config'),{bannedNames},{merge:true});
+  renderBannedList();renderBansTab();
+  showToast('ban removed');
 };
 
 // Settings
