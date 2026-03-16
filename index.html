@@ -874,7 +874,9 @@ function checkIfBanned(){
   if(isAdmin||!currentUser)return;
   const myNick=(localStorage.getItem('myNick')||'').toLowerCase();
   const overlay=document.getElementById('bannedOverlay');
-  const entry=bannedNames.find(b=>b.browserId&&b.browserId===browserId);
+  const username=(currentUser?.username||'').toLowerCase();
+  if(!username)return;
+  const entry=bannedNames.find(b=>(b.name||b)===username);
   if(entry){
     overlay.style.display='flex';
     overlay.style.pointerEvents='all';
@@ -1013,7 +1015,7 @@ window.submitConfession = async function(){
   if(!isAdmin&&slowmodeDelay>0&&Date.now()-lastPostTime<slowmodeDelay*1000)return;
   if(!currentUser){showAuthScreen();return;}
   const nick=anonMode?'anon':filterText(currentUser.username);
-  if(!isAdmin&&bannedNames.some(b=>b.browserId&&b.browserId===browserId)){showToast('you are banned');return;}
+  if(!isAdmin&&bannedNames.some(b=>(b.name||b)===(currentUser?.username||'').toLowerCase())){showToast('you are banned');return;}
   const rawText=document.getElementById('confessionText').value.trim();
   if(!rawText)return;
   const text=filterText(rawText);
@@ -1125,7 +1127,7 @@ window.submitReply = async function(confId){
   if(siteLocked&&!isAdmin){showToast('site is locked');return;}
   if(!currentUser){showAuthScreen();return;}
   const nick=anonMode?'anon':filterText(currentUser.username);
-  if(!isAdmin&&bannedNames.some(b=>b.browserId&&b.browserId===browserId)){showToast('you are banned');return;}
+  if(!isAdmin&&bannedNames.some(b=>(b.name||b)===(currentUser?.username||'').toLowerCase())){showToast('you are banned');return;}
   const input=document.getElementById(`reply-input-${confId}`);
   const rawText=input.value.trim();if(!rawText)return;
   const text=filterText(rawText);
@@ -1213,7 +1215,7 @@ async function renderAdminList(containerId,items,reportedOnly,pendingOnly){
         ${conf.pending?`<button class="admin-btn admin-btn-approve" onclick="approveConfession('${conf.id}')">Approve</button>`:''}
         <button class="admin-btn admin-btn-delete" onclick="deleteConfession('${conf.id}')">Delete</button>
         <button class="admin-btn admin-btn-pin" onclick="togglePin('${conf.id}',${!!conf.pinned})">${conf.pinned?'Unpin':'Pin'}</button>
-        <button class="admin-btn" style="background:var(--red-dim);border:1px solid rgba(255,80,80,0.3);color:var(--red);" onclick="openBanModal('${esc(conf.nickname||'anon')}','${conf.browserId||''}')">Ban user</button>
+        <button class="admin-btn" style="background:var(--red-dim);border:1px solid rgba(255,80,80,0.3);color:var(--red);" onclick="openBanModal('${esc(conf.nickname||'anon')}')">Ban user</button>
         ${(conf.reports||0)>0?`<button class="admin-btn admin-btn-clear" onclick="clearReports('${conf.id}')">Clear reports</button>`:''}
       </div>
       ${replies.length?`<div class="admin-replies">
@@ -1310,19 +1312,14 @@ function renderBansTab(){
   el.innerHTML=bannedNames.map((b,i)=>{
     const name=b.name||b;
     const reason=b.reason||'';
-    const bid=b.browserId||null;
     return`<div class="admin-card" style="margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px;">
-        <div>
-          <div style="color:var(--red);font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:4px;">~${esc(name)}</div>
-          ${reason?`<div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">Reason: ${esc(reason)}</div>`:''}
-          ${bid?`<div style="font-size:10px;color:var(--text-dim);">Browser ID: ${bid.slice(0,12)}...</div>`:'<div style="font-size:10px;color:var(--text-dim);">No browser ID (nickname ban only)</div>'}
-        </div>
+      <div style="margin-bottom:10px;">
+        <div style="color:var(--red);font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:4px;">~${esc(name)}</div>
+        ${reason?`<div style="font-size:11px;color:var(--text-muted);">Reason: ${esc(reason)}</div>`:'<div style="font-size:11px;color:var(--text-dim);">No reason given</div>'}
       </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="admin-btn admin-btn-clear" onclick="unbanNickname('${esc(name)}')">Unban nickname</button>
-        ${bid?`<button class="admin-btn admin-btn-clear" onclick="unbanBrowser('${bid}')">Unban browser</button>`:''}
-        <button class="admin-btn admin-btn-delete" onclick="unbanAll(${i})">Remove entirely</button>
+      <div style="display:flex;gap:8px;">
+        <button class="admin-btn admin-btn-clear" onclick="unbanNickname('${esc(name)}')">Unban</button>
+        <button class="admin-btn admin-btn-delete" onclick="unbanAll(${i})">Remove</button>
       </div>
     </div>`;
   }).join('');
@@ -1339,8 +1336,8 @@ window.banNickname=async function(){
 };
 
 let banTarget = null;
-window.openBanModal = function(nick, confBrowserId){
-  banTarget = {nick, browserId: confBrowserId||null};
+window.openBanModal = function(nick){
+  banTarget = {nick};
   document.getElementById('banReasonInput').value = '';
   document.getElementById('banReasonModal').classList.add('active');
   setTimeout(()=>document.getElementById('banReasonInput').focus(), 100);
@@ -1352,35 +1349,21 @@ window.closeBanModal = function(){
 window.confirmBan = async function(){
   if(!banTarget) return;
   const reason = document.getElementById('banReasonInput').value.trim();
-  const bid = banTarget.browserId;
   const val = banTarget.nick.toLowerCase();
-  if(!bid){ showToast('no browser ID — this post was made before tracking'); closeBanModal(); return; }
-  bannedNames = bannedNames.filter(b=>b.browserId!==bid);
-  bannedNames.push({name:val, reason, browserId:bid});
+  bannedNames = bannedNames.filter(b=>(b.name||b)!==val);
+  bannedNames.push({name:val, reason});
   await setDoc(doc(db,'siteSettings','config'),{bannedNames},{merge:true});
   closeBanModal();
   renderBannedList();
-  showToast(`browser banned`);
+  renderBansTab();
+  showToast(`~${val} banned`);
 };
 
 window.unbanNickname=async function(name){
-  bannedNames=bannedNames.map(b=>{
-    if((b.name||b)===name) return b.browserId?{...b,name:null}:null;
-    return b;
-  }).filter(b=>b&&(b.name||b.browserId));
+  bannedNames=bannedNames.filter(b=>(b.name||b)!==name);
   await setDoc(doc(db,'siteSettings','config'),{bannedNames},{merge:true});
   renderBannedList();renderBansTab();
-  showToast(`~${name} nickname unbanned`);
-};
-
-window.unbanBrowser=async function(bid){
-  bannedNames=bannedNames.map(b=>{
-    if(b.browserId===bid) return b.name?{...b,browserId:null}:null;
-    return b;
-  }).filter(b=>b&&(b.name||b.browserId));
-  await setDoc(doc(db,'siteSettings','config'),{bannedNames},{merge:true});
-  renderBannedList();renderBansTab();
-  showToast('browser unbanned');
+  showToast(`~${name} unbanned`);
 };
 
 window.unbanAll=async function(index){
