@@ -982,7 +982,7 @@ window.submitConfession = async function(){
   const btn=document.getElementById('submitBtn');
   btn.disabled=true; btn.textContent='posting...';
   try{
-    const ref=await addDoc(collection(db,'confessions'),{nickname:nick,text,likes:0,replyCount:0,reports:0,isAdmin,pending:approvalMode&&!isAdmin,browserId,createdAt:serverTimestamp()});
+    const ref=await addDoc(collection(db,'confessions'),{nickname:nick,realUsername:currentUser.username,text,likes:0,replyCount:0,reports:0,isAdmin,pending:approvalMode&&!isAdmin,browserId,createdAt:serverTimestamp()});
     myTokens[ref.id]=token;
     localStorage.setItem('myTokens',JSON.stringify(myTokens));
     localStorage.setItem('myNick',nick);
@@ -1042,7 +1042,7 @@ window.submitReply = async function(confId){
   const rawText=input.value.trim(); if(!rawText) return;
   const text=filterText(rawText);
   input.value='';
-  await addDoc(collection(db,'confessions',confId,'replies'),{nickname:nick,text,isAdmin,createdAt:serverTimestamp()});
+  await addDoc(collection(db,'confessions',confId,'replies'),{nickname:nick,realUsername:currentUser.username,text,isAdmin,createdAt:serverTimestamp()});
   await updateDoc(doc(db,'confessions',confId),{replyCount:increment(1)});
 };
 
@@ -1147,7 +1147,7 @@ async function renderAdminList(elId,list){
   el.innerHTML=withReplies.map(conf=>`
     <div class="admin-card${(conf.reports||0)>0?' has-reports':''}${conf.pending?' pending-admin':''}" id="admin-card-${conf.id}">
       <div class="admin-card-meta">
-        <span class="admin-card-nick">~${esc(conf.nickname||'anon')}</span>
+        <span class="admin-card-nick">~${esc(conf.nickname||'anon')}${conf.nickname==='anon'&&conf.realUsername?`<span style="font-size:10px;color:var(--text-muted);margin-left:6px;">(${esc(conf.realUsername)})</span>`:''}</span>
         <div class="admin-card-info">
           <span class="admin-card-time">${timeAgo(conf.createdAt)}</span>
           ${(conf.reports||0)>0?`<span class="report-count">${conf.reports} reports</span>`:''}
@@ -1165,7 +1165,7 @@ async function renderAdminList(elId,list){
       ${conf.replies&&conf.replies.length?`<div class="admin-replies">
         <div style="font-size:10px;letter-spacing:0.15em;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase">Replies (${conf.replies.length})</div>
         ${conf.replies.map(r=>`<div class="admin-reply-item" id="admin-reply-${r.id}">
-          <div><div class="admin-reply-nick">~${esc(r.nickname||'anon')}</div><div class="admin-reply-text">${esc(r.text)}</div></div>
+          <div><div class="admin-reply-nick">~${esc(r.nickname||'anon')}${r.nickname==='anon'&&r.realUsername?` <span style="font-size:10px;color:var(--text-muted);">(${esc(r.realUsername)})</span>`:''}</div><div class="admin-reply-text">${esc(r.text)}</div></div>
           <button class="admin-btn-delete-reply" onclick="deleteReply('${conf.id}','${r.id}')">Delete</button>
         </div>`).join('')}
       </div>`:''}
