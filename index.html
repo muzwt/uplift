@@ -7,169 +7,238 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0a0c; --bg2: #111116; --bg3: #18181f;
-    --border: rgba(255,255,255,0.06); --border-hover: rgba(255,255,255,0.12);
-    --text: #e8e6e0; --text-muted: #6b6870; --text-dim: #3d3b42;
-    --accent: #9d7fd4; --accent-dim: rgba(157,127,212,0.12);
-    --red: #c4556a; --red-dim: rgba(196,85,106,0.1); --heart: #c4556a;
-    --admin: #e8a24a; --admin-dim: rgba(232,162,74,0.1);
+    --bg:#0a0a0c;--bg2:#111116;--bg3:#18181f;
+    --border:rgba(255,255,255,0.06);--border-hover:rgba(255,255,255,0.12);
+    --text:#e8e6e0;--text-muted:#6b6870;--text-dim:#3d3b42;
+    --accent:#9d7fd4;--accent-dim:rgba(157,127,212,0.12);
+    --red:#c4556a;--red-dim:rgba(196,85,106,0.1);--heart:#c4556a;
+    --admin:#e8a24a;--admin-dim:rgba(232,162,74,0.1);
+    --gold:#f5c842;--gold-dim:rgba(245,200,66,0.1);
   }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { background:var(--bg); color:var(--text); font-family:'DM Mono',monospace; font-size:13px; min-height:100vh; overflow-x:hidden; }
-  body::before { content:''; position:fixed; top:-50%; left:-50%; width:200%; height:200%; background:radial-gradient(ellipse at 30% 20%,rgba(157,127,212,0.04) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(196,85,106,0.03) 0%,transparent 50%); pointer-events:none; z-index:0; }
-  .container { max-width:680px; margin:0 auto; padding:0 20px; position:relative; z-index:1; }
-  header { padding:60px 0 40px; border-bottom:1px solid var(--border); margin-bottom:48px; }
-  .logo { font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:300; letter-spacing:0.1em; margin-bottom:6px; }
-  .logo span { color:var(--accent); font-style:italic; }
-  .tagline { color:var(--text-muted); font-size:11px; letter-spacing:0.15em; text-transform:uppercase; }
-  .post-form { background:var(--bg2); border:1px solid var(--border); border-radius:2px; padding:24px; margin-bottom:48px; transition:border-color 0.3s; }
-  .post-form:focus-within { border-color:var(--border-hover); }
-  .form-label { font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--text-muted); margin-bottom:10px; display:block; }
-  .nick-row { display:flex; gap:10px; margin-bottom:16px; align-items:center; }
-  .nick-prefix { color:var(--accent); }
-  input[type="text"] { background:transparent; border:none; border-bottom:1px solid var(--border); color:var(--text); font-family:'DM Mono',monospace; font-size:13px; padding:6px 0; outline:none; width:180px; transition:border-color 0.2s; }
-  input[type="text"]:focus { border-bottom-color:var(--accent); }
-  input[type="text"]::placeholder { color:var(--text-dim); }
-  textarea { width:100%; background:transparent; border:none; color:var(--text); font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:300; line-height:1.7; resize:none; outline:none; min-height:100px; margin-bottom:16px; }
-  textarea::placeholder { color:var(--text-dim); font-style:italic; }
-  .form-footer { display:flex; justify-content:space-between; align-items:center; }
-  .char-count { color:var(--text-dim); font-size:11px; }
-  .submit-btn { background:transparent; border:1px solid var(--accent); color:var(--accent); font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.15em; text-transform:uppercase; padding:8px 20px; cursor:pointer; transition:all 0.2s; border-radius:1px; }
-  .submit-btn:hover { background:var(--accent-dim); }
-  .submit-btn:disabled { opacity:0.3; cursor:not-allowed; }
-  .feed-header { display:flex; align-items:center; gap:12px; margin-bottom:24px; }
-  .feed-title { font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--text-muted); }
-  .feed-line { flex:1; height:1px; background:var(--border); }
-  .confession-card { border:1px solid var(--border); border-radius:2px; margin-bottom:16px; background:var(--bg2); transition:border-color 0.2s; animation:fadeIn 0.4s ease; }
-  .confession-card.reported-card { border-color:rgba(196,85,106,0.2); }
-  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-  .confession-card:hover { border-color:var(--border-hover); }
-  .card-body { padding:20px 24px; }
-  .card-meta { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
-  .card-nick { color:var(--accent); font-size:11px; letter-spacing:0.1em; display:flex; align-items:center; gap:5px; }
-  .card-time { color:var(--text-dim); font-size:10px; }
-  .admin-badge { display:inline-flex; align-items:center; justify-content:center; width:13px; height:13px; background:var(--admin-dim); border:1px solid var(--admin); border-radius:50%; color:var(--admin); font-size:8px; flex-shrink:0; line-height:1; }
-  .card-text { font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:300; line-height:1.75; color:var(--text); margin-bottom:18px; white-space:pre-wrap; word-break:break-word; }
-  .card-actions { display:flex; gap:20px; align-items:center; padding-top:14px; border-top:1px solid var(--border); }
-  .action-btn { background:none; border:none; cursor:pointer; display:flex; align-items:center; gap:6px; color:var(--text-muted); font-family:'DM Mono',monospace; font-size:11px; padding:4px 0; transition:color 0.2s; }
-  .action-btn:hover { color:var(--text); }
-  .action-btn.liked { color:var(--heart); }
-  .action-btn.reply-btn:hover { color:var(--accent); }
-  .action-btn.report-btn:hover { color:var(--red); }
-  .action-btn svg { width:14px; height:14px; flex-shrink:0; }
-  .action-btn.liked svg { fill:var(--heart); stroke:var(--heart); }
-  .report-badge { margin-left:auto; background:var(--red-dim); border:1px solid rgba(196,85,106,0.3); color:var(--red); font-size:10px; padding:2px 8px; border-radius:1px; }
-  .replies-section { border-top:1px solid var(--border); background:var(--bg); }
-  .replies-section.hidden { display:none; }
-  .reply-item { padding:14px 24px; border-bottom:1px solid var(--border); animation:fadeIn 0.3s ease; }
-  .reply-item:last-child { border-bottom:none; }
-  .reply-meta { display:flex; gap:12px; align-items:center; margin-bottom:8px; }
-  .reply-nick { color:var(--accent); font-size:10px; display:flex; align-items:center; gap:4px; }
-  .reply-time { color:var(--text-dim); font-size:10px; }
-  .reply-text { font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:300; line-height:1.65; color:rgba(232,230,224,0.8); }
-  .reply-form { padding:14px 24px; display:flex; gap:10px; align-items:flex-start; border-top:1px solid var(--border); background:var(--bg3); }
-  .reply-input { flex:1; background:transparent; border:none; border-bottom:1px solid var(--border); color:var(--text); font-family:'Cormorant Garamond',serif; font-size:15px; padding:4px 0; outline:none; transition:border-color 0.2s; }
-  .reply-input:focus { border-bottom-color:var(--accent); }
-  .reply-input::placeholder { color:var(--text-dim); font-style:italic; }
-  .reply-submit { background:none; border:1px solid var(--border); color:var(--text-muted); font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.1em; padding:6px 14px; cursor:pointer; transition:all 0.2s; white-space:nowrap; margin-top:2px; }
-  .reply-submit:hover { border-color:var(--accent); color:var(--accent); }
-  .slowmode-bar { height:2px; background:var(--accent-dim); border-radius:1px; overflow:hidden; margin-top:8px; display:none; }
-  .slowmode-bar.active { display:block; }
-  .slowmode-progress { height:100%; background:var(--accent); width:100%; transition:width 0.1s linear; }
-  .slowmode-msg { font-size:10px; color:var(--accent); letter-spacing:0.1em; margin-top:6px; display:none; }
-  .slowmode-msg.active { display:block; }
-  .admin-settings { padding:4px 0; }
-  .settings-row { display:flex; justify-content:space-between; align-items:center; padding:16px 0; border-bottom:1px solid var(--border); }
-  .settings-row:last-child { border-bottom:none; }
-  .settings-label { font-size:11px; color:var(--text); }
-  .settings-desc { font-size:10px; color:var(--text-muted); margin-top:3px; }
-  .settings-control { display:flex; align-items:center; gap:8px; }
-  .settings-input { background:var(--bg3); border:1px solid var(--border); color:var(--text); font-family:'DM Mono',monospace; font-size:12px; padding:6px 10px; outline:none; width:80px; text-align:center; transition:border-color 0.2s; }
-  .settings-input:focus { border-color:var(--admin); }
-  .settings-save { background:var(--admin-dim); border:1px solid var(--admin); color:var(--admin); font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.1em; padding:6px 14px; cursor:pointer; transition:all 0.2s; }
-  .settings-save:hover { background:rgba(232,162,74,0.2); }
-  .toggle-wrap { display:flex; align-items:center; gap:8px; }
-  .toggle { position:relative; width:36px; height:20px; }
-  .toggle input { opacity:0; width:0; height:0; }
-  .toggle-slider { position:absolute; inset:0; background:var(--bg3); border:1px solid var(--border); border-radius:10px; cursor:pointer; transition:all 0.2s; }
-  .toggle-slider:before { content:''; position:absolute; width:12px; height:12px; left:3px; top:3px; background:var(--text-muted); border-radius:50%; transition:all 0.2s; }
-  .toggle input:checked + .toggle-slider { background:var(--admin-dim); border-color:var(--admin); }
-  .toggle input:checked + .toggle-slider:before { transform:translateX(16px); background:var(--admin); }
-  .admin-trigger { position:fixed; bottom:24px; right:24px; width:36px; height:36px; background:var(--bg2); border:1px solid var(--border); border-radius:2px; cursor:pointer; display:flex; align-items:center; justify-content:center; opacity:0.3; transition:all 0.2s; z-index:50; }
-  .admin-trigger:hover { opacity:1; border-color:var(--admin); }
-  .admin-trigger svg { width:14px; height:14px; stroke:var(--admin); }
-  .admin-overlay { display:none; position:fixed; inset:0; background:#0a0a0c; z-index:200; overflow-y:auto; }
-  .admin-overlay.active { display:block; }
-  .admin-panel { max-width:760px; margin:0 auto; padding:40px 24px; }
-  .admin-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:32px; padding-bottom:16px; border-bottom:1px solid var(--border); }
-  .admin-title { font-size:10px; letter-spacing:0.25em; text-transform:uppercase; color:var(--admin); }
-  .admin-close { background:none; border:1px solid var(--border); color:var(--text-muted); font-family:'DM Mono',monospace; font-size:11px; padding:6px 14px; cursor:pointer; transition:all 0.2s; }
-  .admin-close:hover { border-color:var(--border-hover); color:var(--text); }
-  .admin-tabs { display:flex; gap:2px; margin-bottom:24px; }
-  .admin-tab { background:none; border:1px solid var(--border); color:var(--text-muted); font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; padding:8px 16px; cursor:pointer; transition:all 0.2s; }
-  .admin-tab.active { border-color:var(--admin); color:var(--admin); background:var(--admin-dim); }
-  .admin-section { display:none; }
-  .admin-section.active { display:block; }
-  .admin-card { background:var(--bg2); border:1px solid var(--border); border-radius:2px; margin-bottom:12px; padding:18px 20px; animation:fadeIn 0.3s ease; }
-  .admin-card.has-reports { border-color:rgba(196,85,106,0.25); }
-  .admin-card-meta { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
-  .admin-card-nick { color:var(--accent); font-size:11px; }
-  .admin-card-info { display:flex; gap:12px; align-items:center; }
-  .admin-card-time { color:var(--text-dim); font-size:10px; }
-  .report-count { background:var(--red-dim); border:1px solid rgba(196,85,106,0.3); color:var(--red); font-size:10px; padding:2px 8px; }
-  .admin-card-text { font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:300; line-height:1.65; color:var(--text); margin-bottom:14px; white-space:pre-wrap; word-break:break-word; }
-  .admin-card-actions { display:flex; gap:10px; }
-  .admin-btn-delete { background:var(--red-dim); border:1px solid rgba(196,85,106,0.4); color:var(--red); font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.1em; padding:6px 14px; cursor:pointer; transition:all 0.2s; }
-  .admin-btn-delete:hover { background:rgba(196,85,106,0.2); }
-  .admin-btn-clear { background:none; border:1px solid var(--border); color:var(--text-muted); font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.1em; padding:6px 14px; cursor:pointer; transition:all 0.2s; }
-  .admin-btn-clear:hover { border-color:var(--border-hover); color:var(--text); }
-  .admin-replies { margin-top:12px; border-top:1px solid var(--border); padding-top:12px; }
-  .admin-reply-item { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; padding:8px 0; border-bottom:1px solid var(--border); }
-  .admin-reply-item:last-child { border-bottom:none; }
-  .admin-reply-text { font-family:'Cormorant Garamond',serif; font-size:14px; font-weight:300; color:rgba(232,230,224,0.7); flex:1; }
-  .admin-reply-nick { color:var(--accent); font-size:10px; margin-bottom:4px; }
-  .admin-btn-delete-reply { background:none; border:1px solid rgba(196,85,106,0.2); color:var(--red); font-family:'DM Mono',monospace; font-size:10px; padding:4px 10px; cursor:pointer; transition:all 0.2s; white-space:nowrap; flex-shrink:0; }
-  .admin-btn-delete-reply:hover { background:var(--red-dim); }
-  .admin-empty { text-align:center; color:var(--text-dim); padding:40px; font-size:11px; letter-spacing:0.15em; }
-  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:100; align-items:center; justify-content:center; }
-  .modal-overlay.active { display:flex; }
-  .modal { background:var(--bg2); border:1px solid var(--border); border-radius:2px; padding:28px; width:320px; max-width:90vw; }
-  .modal-title { font-size:10px; letter-spacing:0.2em; text-transform:uppercase; margin-bottom:16px; }
-  .admin-modal-title { color:var(--admin); }
-  .report-modal-title { color:var(--red); }
-  .modal-input { width:100%; background:transparent; border:none; border-bottom:1px solid var(--border); color:var(--text); font-family:'DM Mono',monospace; font-size:13px; padding:8px 0; outline:none; margin-bottom:20px; transition:border-color 0.2s; }
-  .modal-input:focus { border-bottom-color:var(--admin); }
-  .modal-input::placeholder { color:var(--text-dim); }
-  .modal-error { color:var(--red); font-size:11px; margin-bottom:12px; display:none; }
-  .modal-error.show { display:block; }
-  .modal-text { color:var(--text-muted); font-size:12px; line-height:1.6; margin-bottom:20px; }
-  .modal-actions { display:flex; gap:10px; justify-content:flex-end; }
-  .modal-cancel { background:none; border:1px solid var(--border); color:var(--text-muted); font-family:'DM Mono',monospace; font-size:11px; padding:8px 16px; cursor:pointer; transition:all 0.2s; }
-  .modal-cancel:hover { border-color:var(--border-hover); color:var(--text); }
-  .modal-confirm-admin { background:var(--admin-dim); border:1px solid var(--admin); color:var(--admin); font-family:'DM Mono',monospace; font-size:11px; padding:8px 16px; cursor:pointer; transition:all 0.2s; }
-  .modal-confirm-admin:hover { background:rgba(232,162,74,0.2); }
-  .modal-confirm-report { background:var(--red-dim); border:1px solid var(--red); color:var(--red); font-family:'DM Mono',monospace; font-size:11px; padding:8px 16px; cursor:pointer; transition:all 0.2s; }
-  .modal-confirm-report:hover { background:rgba(196,85,106,0.2); }
-  .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:var(--bg3); border:1px solid var(--border); color:var(--text-muted); font-size:11px; letter-spacing:0.1em; padding:10px 20px; border-radius:1px; transition:transform 0.3s ease; z-index:300; white-space:nowrap; }
-  .toast.show { transform:translateX(-50%) translateY(0); }
-  .locked-banner { background:rgba(196,85,106,0.08); border:1px solid rgba(196,85,106,0.25); border-radius:2px; padding:14px 20px; margin-bottom:32px; display:none; align-items:center; gap:12px; }
-  .locked-banner.active { display:flex; }
-  .locked-banner-icon { color:var(--red); font-size:16px; flex-shrink:0; }
-  .locked-banner-text { font-size:11px; color:var(--red); letter-spacing:0.05em; }
-  .empty { text-align:center; color:var(--text-dim); padding:60px 20px; font-family:'Cormorant Garamond',serif; font-style:italic; font-size:18px; }
-  footer { padding:48px 0 32px; text-align:center; color:var(--text-dim); font-size:10px; letter-spacing:0.15em; }
+  body.light {
+    --bg:#f5f4f0;--bg2:#ffffff;--bg3:#eceae4;
+    --border:rgba(0,0,0,0.08);--border-hover:rgba(0,0,0,0.15);
+    --text:#1a1a1e;--text-muted:#888580;--text-dim:#c0bdb8;
+    --accent:#7b5fbf;--accent-dim:rgba(123,95,191,0.1);
+    --red:#b03050;--red-dim:rgba(176,48,80,0.08);--heart:#b03050;
+    --admin:#c07820;--admin-dim:rgba(192,120,32,0.1);
+    --gold:#c09820;--gold-dim:rgba(192,152,32,0.1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;font-size:13px;min-height:100vh;overflow-x:hidden;transition:background 0.3s,color 0.3s;}
+  body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 30% 20%,rgba(157,127,212,0.04) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(196,85,106,0.03) 0%,transparent 50%);pointer-events:none;z-index:0;}
+  .container{max-width:680px;margin:0 auto;padding:0 20px;position:relative;z-index:1;}
+  header{padding:60px 0 40px;border-bottom:1px solid var(--border);margin-bottom:48px;display:flex;justify-content:space-between;align-items:flex-end;}
+  .header-left{}
+  .logo{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;letter-spacing:0.1em;margin-bottom:6px;}
+  .logo span{color:var(--accent);font-style:italic;}
+  .tagline{color:var(--text-muted);font-size:11px;letter-spacing:0.15em;text-transform:uppercase;}
+  .header-right{display:flex;align-items:center;gap:10px;padding-bottom:4px;}
+  .theme-btn{background:none;border:1px solid var(--border);color:var(--text-muted);font-size:14px;width:32px;height:32px;cursor:pointer;border-radius:2px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+  .theme-btn:hover{border-color:var(--border-hover);color:var(--text);}
+  .search-wrap{position:relative;}
+  .search-btn{background:none;border:1px solid var(--border);color:var(--text-muted);font-size:14px;width:32px;height:32px;cursor:pointer;border-radius:2px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+  .search-btn:hover{border-color:var(--border-hover);color:var(--text);}
+  .search-box{position:absolute;top:38px;right:0;width:240px;background:var(--bg2);border:1px solid var(--border);border-radius:2px;padding:10px 12px;display:none;z-index:10;}
+  .search-box.open{display:block;}
+  .search-input{width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:12px;padding:4px 0;outline:none;}
+  .search-input:focus{border-bottom-color:var(--accent);}
+  .search-input::placeholder{color:var(--text-dim);}
+  .locked-banner{background:rgba(196,85,106,0.08);border:1px solid rgba(196,85,106,0.25);border-radius:2px;padding:14px 20px;margin-bottom:32px;display:none;align-items:center;gap:12px;}
+  .locked-banner.active{display:flex;}
+  .locked-banner-icon{color:var(--red);font-size:16px;flex-shrink:0;}
+  .locked-banner-text{font-size:11px;color:var(--red);letter-spacing:0.05em;}
+  .approval-banner{background:rgba(232,162,74,0.08);border:1px solid rgba(232,162,74,0.2);border-radius:2px;padding:12px 20px;margin-bottom:32px;display:none;align-items:center;gap:10px;font-size:11px;color:var(--admin);}
+  .approval-banner.active{display:flex;}
+  .post-form{background:var(--bg2);border:1px solid var(--border);border-radius:2px;padding:24px;margin-bottom:48px;transition:border-color 0.3s;}
+  .post-form:focus-within{border-color:var(--border-hover);}
+  .form-label{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;display:block;}
+  .nick-row{display:flex;gap:10px;margin-bottom:16px;align-items:center;}
+  .nick-prefix{color:var(--accent);}
+  input[type="text"]{background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:13px;padding:6px 0;outline:none;width:180px;transition:border-color 0.2s;}
+  input[type="text"]:focus{border-bottom-color:var(--accent);}
+  input[type="text"]::placeholder{color:var(--text-dim);}
+  textarea{width:100%;background:transparent;border:none;color:var(--text);font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;line-height:1.7;resize:none;outline:none;min-height:100px;margin-bottom:16px;}
+  textarea::placeholder{color:var(--text-dim);font-style:italic;}
+  .form-footer{display:flex;justify-content:space-between;align-items:center;}
+  .char-count{color:var(--text-dim);font-size:11px;}
+  .submit-btn{background:transparent;border:1px solid var(--accent);color:var(--accent);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;padding:8px 20px;cursor:pointer;transition:all 0.2s;border-radius:1px;}
+  .submit-btn:hover{background:var(--accent-dim);}
+  .submit-btn:disabled{opacity:0.3;cursor:not-allowed;}
+  .slowmode-bar{height:2px;background:var(--accent-dim);border-radius:1px;overflow:hidden;margin-top:8px;display:none;}
+  .slowmode-bar.active{display:block;}
+  .slowmode-progress{height:100%;background:var(--accent);width:100%;transition:width 0.1s linear;}
+  .slowmode-msg{font-size:10px;color:var(--accent);letter-spacing:0.1em;margin-top:6px;display:none;}
+  .slowmode-msg.active{display:block;}
+  .feed-header{display:flex;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap;}
+  .feed-title{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted);}
+  .feed-line{flex:1;height:1px;background:var(--border);min-width:20px;}
+  .sort-tabs{display:flex;gap:2px;}
+  .sort-tab{background:none;border:1px solid var(--border);color:var(--text-muted);font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;padding:4px 10px;cursor:pointer;transition:all 0.2s;}
+  .sort-tab.active{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
+  .confession-card{border:1px solid var(--border);border-radius:2px;margin-bottom:16px;background:var(--bg2);transition:border-color 0.2s;animation:fadeIn 0.4s ease;}
+  .confession-card.reported-card{border-color:rgba(196,85,106,0.2);}
+  .confession-card.pinned-card{border-color:var(--gold);background:var(--bg2);}
+  .confession-card.cotd-card{border-color:var(--gold);}
+  .confession-card.pending-card{opacity:0.6;border-style:dashed;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .confession-card:hover{border-color:var(--border-hover);}
+  .confession-card.pinned-card:hover,.confession-card.cotd-card:hover{border-color:var(--gold);}
+  .pin-banner{background:var(--gold-dim);padding:6px 24px;font-size:10px;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;border-bottom:1px solid rgba(245,200,66,0.15);}
+  .cotd-banner{background:var(--gold-dim);padding:6px 24px;font-size:10px;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;border-bottom:1px solid rgba(245,200,66,0.15);}
+  .pending-banner{background:var(--admin-dim);padding:6px 24px;font-size:10px;color:var(--admin);letter-spacing:0.15em;text-transform:uppercase;border-bottom:1px solid rgba(232,162,74,0.15);}
+  .card-body{padding:20px 24px;}
+  .card-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+  .card-nick{color:var(--accent);font-size:11px;letter-spacing:0.1em;display:flex;align-items:center;gap:5px;}
+  .card-time{color:var(--text-dim);font-size:10px;}
+  .admin-badge{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;background:var(--admin-dim);border:1px solid var(--admin);border-radius:50%;color:var(--admin);font-size:8px;flex-shrink:0;line-height:1;}
+  .card-text{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;line-height:1.75;color:var(--text);margin-bottom:18px;white-space:pre-wrap;word-break:break-word;}
+  .card-actions{display:flex;gap:16px;align-items:center;padding-top:14px;border-top:1px solid var(--border);flex-wrap:wrap;}
+  .action-btn{background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:5px;color:var(--text-muted);font-family:'DM Mono',monospace;font-size:11px;padding:4px 0;transition:color 0.2s;}
+  .action-btn:hover{color:var(--text);}
+  .action-btn.liked{color:var(--heart);}
+  .action-btn.bookmarked{color:var(--gold);}
+  .action-btn.reply-btn:hover{color:var(--accent);}
+  .action-btn.report-btn:hover{color:var(--red);}
+  .action-btn svg{width:13px;height:13px;flex-shrink:0;}
+  .action-btn.liked svg{fill:var(--heart);stroke:var(--heart);}
+  .action-btn.bookmarked svg{fill:var(--gold);stroke:var(--gold);}
+  .reactions-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+  .reaction-btn{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:13px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:4px;color:var(--text-muted);}
+  .reaction-btn:hover{border-color:var(--border-hover);background:var(--bg2);}
+  .reaction-btn.reacted{border-color:var(--accent);background:var(--accent-dim);color:var(--accent);}
+  .reaction-count{font-family:'DM Mono',monospace;font-size:10px;}
+  .report-badge{margin-left:auto;background:var(--red-dim);border:1px solid rgba(196,85,106,0.3);color:var(--red);font-size:10px;padding:2px 8px;border-radius:1px;}
+  .replies-section{border-top:1px solid var(--border);background:var(--bg);}
+  .replies-section.hidden{display:none;}
+  .reply-item{padding:14px 24px;border-bottom:1px solid var(--border);animation:fadeIn 0.3s ease;}
+  .reply-item:last-child{border-bottom:none;}
+  .reply-meta{display:flex;gap:12px;align-items:center;margin-bottom:8px;}
+  .reply-nick{color:var(--accent);font-size:10px;display:flex;align-items:center;gap:4px;}
+  .reply-time{color:var(--text-dim);font-size:10px;}
+  .reply-text{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:300;line-height:1.65;color:var(--text);opacity:0.8;}
+  .reply-form{padding:14px 24px;display:flex;gap:10px;align-items:flex-start;border-top:1px solid var(--border);background:var(--bg3);}
+  .reply-input{flex:1;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'Cormorant Garamond',serif;font-size:15px;padding:4px 0;outline:none;transition:border-color 0.2s;}
+  .reply-input:focus{border-bottom-color:var(--accent);}
+  .reply-input::placeholder{color:var(--text-dim);font-style:italic;}
+  .reply-submit{background:none;border:1px solid var(--border);color:var(--text-muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;padding:6px 14px;cursor:pointer;transition:all 0.2s;white-space:nowrap;margin-top:2px;}
+  .reply-submit:hover{border-color:var(--accent);color:var(--accent);}
+  .no-results{text-align:center;color:var(--text-dim);padding:40px;font-size:11px;letter-spacing:0.2em;}
+  .admin-trigger{position:fixed;bottom:24px;right:24px;width:36px;height:36px;background:var(--bg2);border:1px solid var(--border);border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0.3;transition:all 0.2s;z-index:50;}
+  .admin-trigger:hover{opacity:1;border-color:var(--admin);}
+  .admin-trigger svg{width:14px;height:14px;stroke:var(--admin);}
+  .admin-overlay{display:none;position:fixed;inset:0;background:var(--bg);z-index:200;overflow-y:auto;}
+  .admin-overlay.active{display:block;}
+  .admin-panel{max-width:760px;margin:0 auto;padding:40px 24px;}
+  .admin-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+  .admin-title{font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--admin);}
+  .admin-close{background:none;border:1px solid var(--border);color:var(--text-muted);font-family:'DM Mono',monospace;font-size:11px;padding:6px 14px;cursor:pointer;transition:all 0.2s;}
+  .admin-close:hover{border-color:var(--border-hover);color:var(--text);}
+  .admin-tabs{display:flex;gap:2px;margin-bottom:24px;flex-wrap:wrap;}
+  .admin-tab{background:none;border:1px solid var(--border);color:var(--text-muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;padding:8px 14px;cursor:pointer;transition:all 0.2s;}
+  .admin-tab.active{border-color:var(--admin);color:var(--admin);background:var(--admin-dim);}
+  .admin-section{display:none;}
+  .admin-section.active{display:block;}
+  .admin-card{background:var(--bg2);border:1px solid var(--border);border-radius:2px;margin-bottom:12px;padding:18px 20px;animation:fadeIn 0.3s ease;}
+  .admin-card.has-reports{border-color:rgba(196,85,106,0.25);}
+  .admin-card.pending-admin{border-color:rgba(232,162,74,0.3);}
+  .admin-card-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .admin-card-nick{color:var(--accent);font-size:11px;}
+  .admin-card-info{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .admin-card-time{color:var(--text-dim);font-size:10px;}
+  .report-count{background:var(--red-dim);border:1px solid rgba(196,85,106,0.3);color:var(--red);font-size:10px;padding:2px 8px;}
+  .pending-tag{background:var(--admin-dim);border:1px solid rgba(232,162,74,0.3);color:var(--admin);font-size:10px;padding:2px 8px;}
+  .admin-card-text{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:300;line-height:1.65;color:var(--text);margin-bottom:14px;white-space:pre-wrap;word-break:break-word;}
+  .admin-card-actions{display:flex;gap:8px;flex-wrap:wrap;}
+  .admin-btn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;padding:6px 14px;cursor:pointer;transition:all 0.2s;border-radius:1px;}
+  .admin-btn-delete{background:var(--red-dim);border:1px solid rgba(196,85,106,0.4);color:var(--red);}
+  .admin-btn-delete:hover{background:rgba(196,85,106,0.2);}
+  .admin-btn-clear{background:none;border:1px solid var(--border);color:var(--text-muted);}
+  .admin-btn-clear:hover{border-color:var(--border-hover);color:var(--text);}
+  .admin-btn-approve{background:rgba(157,127,212,0.1);border:1px solid rgba(157,127,212,0.4);color:var(--accent);}
+  .admin-btn-approve:hover{background:rgba(157,127,212,0.2);}
+  .admin-btn-pin{background:var(--gold-dim);border:1px solid rgba(245,200,66,0.4);color:var(--gold);}
+  .admin-btn-pin:hover{background:rgba(245,200,66,0.2);}
+  .admin-replies{margin-top:12px;border-top:1px solid var(--border);padding-top:12px;}
+  .admin-reply-item{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);}
+  .admin-reply-item:last-child{border-bottom:none;}
+  .admin-reply-text{font-family:'Cormorant Garamond',serif;font-size:14px;font-weight:300;color:var(--text);opacity:0.7;flex:1;}
+  .admin-reply-nick{color:var(--accent);font-size:10px;margin-bottom:4px;}
+  .admin-btn-delete-reply{background:none;border:1px solid rgba(196,85,106,0.2);color:var(--red);font-family:'DM Mono',monospace;font-size:10px;padding:4px 10px;cursor:pointer;transition:all 0.2s;white-space:nowrap;flex-shrink:0;}
+  .admin-btn-delete-reply:hover{background:var(--red-dim);}
+  .admin-empty{text-align:center;color:var(--text-dim);padding:40px;font-size:11px;letter-spacing:0.15em;}
+  .admin-settings{padding:4px 0;}
+  .settings-row{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid var(--border);gap:16px;}
+  .settings-row:last-child{border-bottom:none;}
+  .settings-label{font-size:11px;color:var(--text);}
+  .settings-desc{font-size:10px;color:var(--text-muted);margin-top:3px;}
+  .settings-control{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+  .settings-input{background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:12px;padding:6px 10px;outline:none;width:80px;text-align:center;transition:border-color 0.2s;}
+  .settings-input:focus{border-color:var(--admin);}
+  .settings-save{background:var(--admin-dim);border:1px solid var(--admin);color:var(--admin);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;padding:6px 14px;cursor:pointer;transition:all 0.2s;}
+  .settings-save:hover{background:rgba(232,162,74,0.2);}
+  .settings-text-input{background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:11px;padding:6px 10px;outline:none;width:220px;transition:border-color 0.2s;}
+  .settings-text-input:focus{border-color:var(--admin);}
+  .settings-select{background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:11px;padding:6px 10px;outline:none;width:220px;cursor:pointer;}
+  .toggle-wrap{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+  .toggle{position:relative;width:36px;height:20px;}
+  .toggle input{opacity:0;width:0;height:0;}
+  .toggle-slider{position:absolute;inset:0;background:var(--bg3);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all 0.2s;}
+  .toggle-slider:before{content:'';position:absolute;width:12px;height:12px;left:3px;top:3px;background:var(--text-muted);border-radius:50%;transition:all 0.2s;}
+  .toggle input:checked+.toggle-slider{background:var(--admin-dim);border-color:var(--admin);}
+  .toggle input:checked+.toggle-slider:before{transform:translateX(16px);background:var(--admin);}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:300;align-items:center;justify-content:center;}
+  .modal-overlay.active{display:flex;}
+  .modal{background:var(--bg2);border:1px solid var(--border);border-radius:2px;padding:28px;width:320px;max-width:90vw;}
+  .modal-title{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:16px;}
+  .admin-modal-title{color:var(--admin);}
+  .report-modal-title{color:var(--red);}
+  .modal-input{width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:13px;padding:8px 0;outline:none;margin-bottom:20px;transition:border-color 0.2s;}
+  .modal-input:focus{border-bottom-color:var(--admin);}
+  .modal-input::placeholder{color:var(--text-dim);}
+  .modal-error{color:var(--red);font-size:11px;margin-bottom:12px;display:none;}
+  .modal-error.show{display:block;}
+  .modal-text{color:var(--text-muted);font-size:12px;line-height:1.6;margin-bottom:20px;}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;}
+  .modal-cancel{background:none;border:1px solid var(--border);color:var(--text-muted);font-family:'DM Mono',monospace;font-size:11px;padding:8px 16px;cursor:pointer;transition:all 0.2s;}
+  .modal-cancel:hover{border-color:var(--border-hover);color:var(--text);}
+  .modal-confirm-admin{background:var(--admin-dim);border:1px solid var(--admin);color:var(--admin);font-family:'DM Mono',monospace;font-size:11px;padding:8px 16px;cursor:pointer;transition:all 0.2s;}
+  .modal-confirm-admin:hover{background:rgba(232,162,74,0.2);}
+  .modal-confirm-report{background:var(--red-dim);border:1px solid var(--red);color:var(--red);font-family:'DM Mono',monospace;font-size:11px;padding:8px 16px;cursor:pointer;transition:all 0.2s;}
+  .modal-confirm-report:hover{background:rgba(196,85,106,0.2);}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg3);border:1px solid var(--border);color:var(--text-muted);font-size:11px;letter-spacing:0.1em;padding:10px 20px;border-radius:1px;transition:transform 0.3s ease;z-index:400;white-space:nowrap;}
+  .toast.show{transform:translateX(-50%) translateY(0);}
+  .loading{text-align:center;color:var(--text-dim);padding:40px;font-size:11px;letter-spacing:0.2em;}
+  .empty{text-align:center;color:var(--text-dim);padding:60px 20px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;}
+  footer{padding:48px 0 32px;text-align:center;color:var(--text-dim);font-size:10px;letter-spacing:0.15em;}
 </style>
 </head>
 <body>
 <div class="container">
   <header>
-    <div class="logo">Say It <span>Anonymously</span></div>
-    <div class="tagline">No names. No judgment. Just honesty.</div>
+    <div class="header-left">
+      <div class="logo">Say It <span>Anonymously</span></div>
+      <div class="tagline">No names. No judgment. Just honesty.</div>
+    </div>
+    <div class="header-right">
+      <div class="search-wrap">
+        <button class="search-btn" onclick="toggleSearch()" title="Search">🔍</button>
+        <div class="search-box" id="searchBox">
+          <input class="search-input" id="searchInput" placeholder="search confessions..." oninput="doSearch(this.value)">
+        </div>
+      </div>
+      <button class="theme-btn" onclick="toggleTheme()" id="themeBtn" title="Toggle theme">🌙</button>
+    </div>
   </header>
+
   <div class="locked-banner" id="lockedBanner">
     <span class="locked-banner-icon">🔒</span>
-    <span class="locked-banner-text" id="lockedBannerText">This site is currently locked. New posts and replies are disabled.</span>
+    <span class="locked-banner-text" id="lockedBannerText">This site is currently locked.</span>
   </div>
+  <div class="approval-banner" id="approvalBanner">
+    ⏳ <span>Confessions require approval before appearing.</span>
+  </div>
+
   <div class="post-form" id="postForm">
     <label class="form-label">Your confession</label>
     <div class="nick-row">
@@ -184,10 +253,17 @@
     <div class="slowmode-bar" id="slowmodeBar"><div class="slowmode-progress" id="slowmodeProgress"></div></div>
     <div class="slowmode-msg" id="slowmodeMsg"></div>
   </div>
+
   <div class="feed-header">
     <span class="feed-title">Confessions</span>
     <div class="feed-line"></div>
+    <div class="sort-tabs">
+      <button class="sort-tab active" id="tab-new" onclick="setSort('new')">New</button>
+      <button class="sort-tab" id="tab-hot" onclick="setSort('hot')">🔥 Hot</button>
+      <button class="sort-tab" id="tab-bookmarks" onclick="setSort('bookmarks')">🔖 Saved</button>
+    </div>
   </div>
+
   <div id="feed"><div class="loading">loading...</div></div>
   <footer>say it anonymously &mdash; no logs, no traces</footer>
 </div>
@@ -206,32 +282,56 @@
     </div>
     <div class="admin-tabs">
       <button class="admin-tab active" onclick="switchTab('reported')">Reported</button>
+      <button class="admin-tab" onclick="switchTab('pending')">Pending</button>
       <button class="admin-tab" onclick="switchTab('all')">All posts</button>
+      <button class="admin-tab" onclick="switchTab('banned')">Banned</button>
       <button class="admin-tab" onclick="switchTab('settings')">Settings</button>
     </div>
     <div class="admin-section active" id="tab-reported"><div id="reported-list"><div class="admin-empty">loading...</div></div></div>
+    <div class="admin-section" id="tab-pending"><div id="pending-list"><div class="admin-empty">loading...</div></div></div>
     <div class="admin-section" id="tab-all"><div id="all-list"><div class="admin-empty">loading...</div></div></div>
+    <div class="admin-section" id="tab-banned">
+      <div id="banned-list"></div>
+      <div style="margin-top:16px;display:flex;gap:8px;">
+        <input type="text" id="banInput" placeholder="nickname to ban" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:12px;padding:8px 12px;outline:none;flex:1;" onfocus="this.style.borderColor='var(--red)'" onblur="this.style.borderColor='var(--border)'">
+        <button class="admin-btn admin-btn-delete" onclick="banNickname()">Ban</button>
+      </div>
+    </div>
     <div class="admin-section" id="tab-settings">
       <div class="admin-settings">
         <div class="settings-row">
-          <div><div class="settings-label">Lock down site</div><div class="settings-desc">Prevent all new posts and replies from users</div></div>
+          <div><div class="settings-label">Lock down site</div><div class="settings-desc">Prevent all new posts and replies</div></div>
           <div class="toggle-wrap">
             <label class="toggle"><input type="checkbox" id="lockToggle" onchange="saveLockdown()"><span class="toggle-slider"></span></label>
             <span style="font-size:10px;color:var(--text-muted)" id="lockStatus">unlocked</span>
           </div>
         </div>
         <div class="settings-row">
-          <div><div class="settings-label">Lockdown reason</div><div class="settings-desc">Message shown to users when site is locked</div></div>
-          <div class="settings-control" style="flex-direction:column;align-items:flex-end;gap:8px">
-            <select id="lockReasonPreset" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:11px;padding:6px 10px;outline:none;width:220px;" onchange="onPresetChange()">
+          <div><div class="settings-label">Lockdown reason</div><div class="settings-desc">Message shown when site is locked</div></div>
+          <div class="settings-control" style="flex-direction:column;align-items:flex-end;gap:8px;">
+            <select id="lockReasonPreset" class="settings-select" onchange="onPresetChange()">
               <option value="">— choose a reason —</option>
               <option value="Under maintenance. Back soon.">🔧 Maintenance</option>
               <option value="Taking a break. Back later.">☕ Taking a break</option>
               <option value="Temporarily closed for moderation.">🛡️ Moderation</option>
               <option value="custom">✏️ Custom reason...</option>
             </select>
-            <input type="text" id="lockReasonCustom" placeholder="type your reason..." maxlength="120" style="display:none;width:220px;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:11px;padding:6px 10px;outline:none;" onfocus="this.style.borderColor='var(--admin)'" onblur="this.style.borderColor='var(--border)'">
+            <input type="text" id="lockReasonCustom" placeholder="type your reason..." maxlength="120" class="settings-text-input" style="display:none;" onfocus="this.style.borderColor='var(--admin)'" onblur="this.style.borderColor='var(--border)'">
             <button class="settings-save" onclick="saveLockReason()">Save reason</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label">Approval mode</div><div class="settings-desc">Posts must be approved by admin before showing</div></div>
+          <div class="toggle-wrap">
+            <label class="toggle"><input type="checkbox" id="approvalToggle" onchange="saveApprovalMode()"><span class="toggle-slider"></span></label>
+            <span style="font-size:10px;color:var(--text-muted)" id="approvalStatus">off</span>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label">Auto-delete old posts</div><div class="settings-desc">Days before posts are removed (0 = never)</div></div>
+          <div class="settings-control">
+            <input type="number" class="settings-input" id="autoDeleteDays" min="0" max="365" value="0">
+            <button class="settings-save" onclick="saveAutoDelete()">Save</button>
           </div>
         </div>
         <div class="settings-row">
@@ -249,9 +349,9 @@
           </div>
         </div>
         <div class="settings-row">
-          <div><div class="settings-label">Custom blocked words</div><div class="settings-desc">Comma separated words to block (in addition to defaults)</div></div>
-          <div class="settings-control" style="flex-direction:column;align-items:flex-end;gap:8px">
-            <input type="text" id="customWords" placeholder="word1, word2, word3" style="width:220px;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:11px;padding:6px 10px;outline:none;" onfocus="this.style.borderColor='var(--admin)'" onblur="this.style.borderColor='var(--border)'">
+          <div><div class="settings-label">Custom blocked words</div><div class="settings-desc">Comma separated words to block</div></div>
+          <div class="settings-control" style="flex-direction:column;align-items:flex-end;gap:8px;">
+            <input type="text" id="customWords" placeholder="word1, word2, word3" class="settings-text-input" onfocus="this.style.borderColor='var(--admin)'" onblur="this.style.borderColor='var(--border)'">
             <button class="settings-save" onclick="saveCustomWords()">Save</button>
           </div>
         </div>
@@ -286,382 +386,539 @@
 <div class="toast" id="toast"></div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore,collection,addDoc,getDocs,updateDoc,deleteDoc,doc,onSnapshot,query,orderBy,serverTimestamp,increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDRVZQ7EESlC60lBKzHwR0G_ZZZi-kw6Ms",
-    authDomain: "say-it-anonymously.firebaseapp.com",
-    projectId: "say-it-anonymously",
-    storageBucket: "say-it-anonymously.firebasestorage.app",
-    messagingSenderId: "423965767473",
-    appId: "1:423965767473:web:b78b98c13b68fbc4222210"
-  };
+const firebaseConfig = {
+  apiKey:"AIzaSyDRVZQ7EESlC60lBKzHwR0G_ZZZi-kw6Ms",
+  authDomain:"say-it-anonymously.firebaseapp.com",
+  projectId:"say-it-anonymously",
+  storageBucket:"say-it-anonymously.firebasestorage.app",
+  messagingSenderId:"423965767473",
+  appId:"1:423965767473:web:b78b98c13b68fbc4222210"
+};
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const ADMIN_PASSWORD = "Oranges";
-  let isAdmin = false;
-  const liked = JSON.parse(localStorage.getItem('liked') || '{}');
-  const reported = JSON.parse(localStorage.getItem('reported') || '{}');
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const ADMIN_PASSWORD = "Oranges";
+const REACTIONS = ['😂','😢','😮','❤️','🔥'];
+let isAdmin = false;
+let allConfessions = [];
+let currentSort = 'new';
+let searchQuery = '';
 
-  // --- Settings (stored in localStorage) ---
-  let slowmodeDelay = parseInt(localStorage.getItem('slowmodeDelay')||'30');
-  let filterEnabled = localStorage.getItem('filterEnabled') === 'true';
-  let customWords = JSON.parse(localStorage.getItem('customWords')||'[]');
-  let siteLocked = localStorage.getItem('siteLocked') === 'true';
-  let lockReason = localStorage.getItem('lockReason') || 'This site is currently locked. New posts and replies are disabled.';
-  let lastPostTime = 0;
+// localStorage state
+const liked = JSON.parse(localStorage.getItem('liked')||'{}');
+const reported = JSON.parse(localStorage.getItem('reported')||'{}');
+const reacted = JSON.parse(localStorage.getItem('reacted')||'{}');
+const bookmarks = JSON.parse(localStorage.getItem('bookmarks')||'{}');
+let slowmodeDelay = parseInt(localStorage.getItem('slowmodeDelay')||'30');
+let filterEnabled = localStorage.getItem('filterEnabled')==='true';
+let customWords = JSON.parse(localStorage.getItem('customWords')||'[]');
+let siteLocked = localStorage.getItem('siteLocked')==='true';
+let lockReason = localStorage.getItem('lockReason')||'This site is currently locked.';
+let approvalMode = localStorage.getItem('approvalMode')==='true';
+let autoDeleteDays = parseInt(localStorage.getItem('autoDeleteDays')||'0');
+let bannedNames = JSON.parse(localStorage.getItem('bannedNames')||'[]');
+let lightMode = localStorage.getItem('lightMode')==='true';
+let lastPostTime = 0;
 
-  function applyLockdown() {
-    const form = document.getElementById('postForm');
-    const banner = document.getElementById('lockedBanner');
-    const bannerText = document.getElementById('lockedBannerText');
-    bannerText.textContent = lockReason;
-    if (siteLocked && !isAdmin) {
-      form.style.display = 'none';
-      banner.classList.add('active');
-    } else {
-      form.style.display = '';
-      banner.classList.remove('active');
-    }
+// Theme
+if(lightMode){document.body.classList.add('light');document.getElementById('themeBtn').textContent='☀️';}
+
+window.toggleTheme = function(){
+  lightMode=!lightMode;
+  document.body.classList.toggle('light',lightMode);
+  document.getElementById('themeBtn').textContent=lightMode?'☀️':'🌙';
+  localStorage.setItem('lightMode',lightMode);
+};
+
+// Search
+window.toggleSearch = function(){
+  const box=document.getElementById('searchBox');
+  box.classList.toggle('open');
+  if(box.classList.contains('open'))document.getElementById('searchInput').focus();
+  else{searchQuery='';document.getElementById('searchInput').value='';renderSorted();}
+};
+
+window.doSearch = function(val){
+  searchQuery=val.toLowerCase();
+  renderSorted();
+};
+
+document.addEventListener('click',e=>{
+  const wrap=document.querySelector('.search-wrap');
+  if(!wrap.contains(e.target)){
+    document.getElementById('searchBox').classList.remove('open');
   }
-  applyLockdown();
+});
 
-  const DEFAULT_BAD_WORDS = ['fuck','shit','ass','bitch','bastard','dick','pussy','cunt','cock','nigger','nigga','faggot','fag','whore','slut','retard','kys'];
+// Sort
+window.setSort = function(s){
+  currentSort=s;
+  document.querySelectorAll('.sort-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(`tab-${s}`).classList.add('active');
+  renderSorted();
+};
 
-  function getBadWords() { return [...DEFAULT_BAD_WORDS, ...customWords]; }
+function renderSorted(){
+  let list=[...allConfessions];
+  if(currentSort==='bookmarks') list=list.filter(c=>bookmarks[c.id]);
+  if(searchQuery) list=list.filter(c=>(c.text||'').toLowerCase().includes(searchQuery)||(c.nickname||'').toLowerCase().includes(searchQuery));
+  if(currentSort==='hot') list.sort((a,b)=>((b.likes||0)+(b.replyCount||0)*2)-((a.likes||0)+(a.replyCount||0)*2));
+  renderFeed(list);
+}
 
-  function filterText(text) {
-    if (!filterEnabled) return text;
-    let out = text;
-    getBadWords().forEach(w => {
-      if (!w.trim()) return;
-      const re = new RegExp(`\\b${w.trim()}\\b`, 'gi');
-      out = out.replace(re, m => '*'.repeat(m.length));
-    });
-    return out;
-  }
-
-  function startSlowmode() {
-    if (isAdmin || slowmodeDelay <= 0) return;
-    lastPostTime = Date.now();
-    const bar = document.getElementById('slowmodeBar');
-    const prog = document.getElementById('slowmodeProgress');
-    const msg = document.getElementById('slowmodeMsg');
-    const btn = document.getElementById('submitBtn');
-    bar.classList.add('active');
-    msg.classList.add('active');
-    btn.disabled = true;
-    const end = lastPostTime + slowmodeDelay * 1000;
-    const iv = setInterval(() => {
-      const remaining = Math.ceil((end - Date.now()) / 1000);
-      const pct = ((end - Date.now()) / (slowmodeDelay * 1000)) * 100;
-      prog.style.width = Math.max(0, pct) + '%';
-      msg.textContent = `slowmode — wait ${remaining}s`;
-      if (Date.now() >= end) {
-        clearInterval(iv);
-        bar.classList.remove('active');
-        msg.classList.remove('active');
-        btn.disabled = false;
-      }
-    }, 100);
-  }
-
-  function timeAgo(ts) {
-    if (!ts) return 'just now';
-    const s = Math.floor((Date.now() - ts.toMillis()) / 1000);
-    if (s < 60) return 'just now';
-    if (s < 3600) return `${Math.floor(s/60)}m ago`;
-    if (s < 86400) return `${Math.floor(s/3600)}h ago`;
-    return `${Math.floor(s/86400)}d ago`;
-  }
-
-  function esc(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-  function renderFeed(confessions) {
-    const feed = document.getElementById('feed');
-    if (!confessions.length) { feed.innerHTML = '<div class="empty">No confessions yet. Be the first.</div>'; return; }
-    feed.innerHTML = '';
-    confessions.forEach(conf => {
-      const isLiked = liked[conf.id];
-      const isReported = reported[conf.id];
-      const hasReports = (conf.reports || 0) > 0;
-      const card = document.createElement('div');
-      card.className = `confession-card${hasReports ? ' reported-card' : ''}`;
-      card.id = `card-${conf.id}`;
-      card.innerHTML = `
-        <div class="card-body">
-          <div class="card-meta">
-            <span class="card-nick">~${esc(conf.nickname||'anon')}${conf.isAdmin?'<span class="admin-badge">✓</span>':''}</span>
-            <span class="card-time">${timeAgo(conf.createdAt)}</span>
-          </div>
-          <div class="card-text">${esc(conf.text)}</div>
-          <div class="card-actions">
-            <button class="action-btn ${isLiked?'liked':''}" id="like-${conf.id}" onclick="toggleLike('${conf.id}',${conf.likes||0})">
-              <svg viewBox="0 0 24 24" fill="${isLiked?'currentColor':'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-              <span id="likes-${conf.id}">${conf.likes||0}</span>
-            </button>
-            <button class="action-btn reply-btn" onclick="toggleReplies('${conf.id}')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-              <span id="replycount-${conf.id}">${conf.replyCount||0}</span>
-            </button>
-            <button class="action-btn report-btn" onclick="openReport('${conf.id}')" ${isReported?'disabled style="opacity:0.3"':''}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-              ${isReported?'reported':'report'}
-            </button>
-            ${hasReports?`<span class="report-badge">${conf.reports} report${conf.reports>1?'s':''}</span>`:''}
-          </div>
-        </div>
-        <div class="replies-section hidden" id="replies-${conf.id}">
-          <div id="replies-list-${conf.id}"></div>
-          <div class="reply-form">
-            <input class="reply-input" id="reply-input-${conf.id}" placeholder="Write a reply..." maxlength="300">
-            <button class="reply-submit" onclick="submitReply('${conf.id}')">reply</button>
-          </div>
-        </div>`;
-      feed.appendChild(card);
-    });
-  }
-
-  onSnapshot(query(collection(db,'confessions'),orderBy('createdAt','desc')), snap => {
-    renderFeed(snap.docs.map(d=>({id:d.id,...d.data()})));
+// Bad word filter
+const DEFAULT_BAD_WORDS=['fuck','shit','ass','bitch','bastard','dick','pussy','cunt','cock','nigger','nigga','faggot','fag','whore','slut','retard','kys'];
+function filterText(t){
+  if(!filterEnabled)return t;
+  let o=t;
+  [...DEFAULT_BAD_WORDS,...customWords].forEach(w=>{
+    if(!w.trim())return;
+    const re=new RegExp(`\\b${w.trim()}\\b`,'gi');
+    o=o.replace(re,m=>'*'.repeat(m.length));
   });
+  return o;
+}
 
-  window.submitConfession = async function() {
-    if (siteLocked && !isAdmin) { showToast('site is locked'); return; }
-    if (!isAdmin && slowmodeDelay > 0 && Date.now() - lastPostTime < slowmodeDelay * 1000) return;
-    const nick = filterText(document.getElementById('nickname').value.trim()||'anon');
-    const rawText = document.getElementById('confessionText').value.trim();
-    if (!rawText) return;
-    const text = filterText(rawText);
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = true; btn.textContent = 'posting...';
-    try {
-      await addDoc(collection(db,'confessions'),{nickname:nick,text,likes:0,replyCount:0,reports:0,isAdmin:isAdmin,createdAt:serverTimestamp()});
-      document.getElementById('confessionText').value = '';
-      document.getElementById('charCount').textContent = '0';
-      showToast('confession posted');
-      startSlowmode();
-    } catch(e) { showToast('error posting'); btn.disabled=false; }
-    if (isAdmin || slowmodeDelay <= 0) { btn.disabled = false; btn.textContent = 'Post it'; }
-    else btn.textContent = 'Post it';
-  };
+// Slowmode
+function startSlowmode(){
+  if(isAdmin||slowmodeDelay<=0)return;
+  lastPostTime=Date.now();
+  const bar=document.getElementById('slowmodeBar'),prog=document.getElementById('slowmodeProgress'),msg=document.getElementById('slowmodeMsg'),btn=document.getElementById('submitBtn');
+  bar.classList.add('active');msg.classList.add('active');btn.disabled=true;
+  const end=lastPostTime+slowmodeDelay*1000;
+  const iv=setInterval(()=>{
+    const rem=Math.ceil((end-Date.now())/1000);
+    const pct=((end-Date.now())/(slowmodeDelay*1000))*100;
+    prog.style.width=Math.max(0,pct)+'%';
+    msg.textContent=`slowmode — wait ${rem}s`;
+    if(Date.now()>=end){clearInterval(iv);bar.classList.remove('active');msg.classList.remove('active');btn.disabled=false;}
+  },100);
+}
 
-  window.toggleLike = async function(id, current) {
-    if (liked[id]) return;
-    liked[id] = true; localStorage.setItem('liked',JSON.stringify(liked));
-    const btn = document.getElementById(`like-${id}`);
-    btn.classList.add('liked'); btn.querySelector('svg').setAttribute('fill','currentColor');
-    document.getElementById(`likes-${id}`).textContent = current+1;
-    await updateDoc(doc(db,'confessions',id),{likes:increment(1)});
-  };
+// Lockdown
+function applyLockdown(){
+  const form=document.getElementById('postForm'),banner=document.getElementById('lockedBanner'),bannerText=document.getElementById('lockedBannerText'),approvalBanner=document.getElementById('approvalBanner');
+  bannerText.textContent=lockReason;
+  if(siteLocked&&!isAdmin){form.style.display='none';banner.classList.add('active');}
+  else{form.style.display='';banner.classList.remove('active');}
+  approvalBanner.classList.toggle('active',approvalMode&&!isAdmin);
+}
+applyLockdown();
 
-  window.toggleReplies = async function(id) {
-    const s = document.getElementById(`replies-${id}`);
-    s.classList.toggle('hidden');
-    if (!s.classList.contains('hidden')) loadReplies(id);
-  };
+// Auto-delete
+function autoDeleteOld(confessions){
+  if(!autoDeleteDays||!isAdmin)return;
+  const cutoff=Date.now()-autoDeleteDays*86400000;
+  confessions.forEach(async c=>{
+    if(c.createdAt&&c.createdAt.toMillis()<cutoff){
+      const rs=await getDocs(collection(db,'confessions',c.id,'replies'));
+      for(const r of rs.docs)await deleteDoc(r.ref);
+      await deleteDoc(doc(db,'confessions',c.id));
+    }
+  });
+}
 
-  function loadReplies(confId) {
-    const list = document.getElementById(`replies-list-${confId}`);
-    list.innerHTML = '<div class="loading" style="padding:16px 24px">loading...</div>';
-    onSnapshot(query(collection(db,'confessions',confId,'replies'),orderBy('createdAt','asc')), snap => {
-      if (snap.empty) { list.innerHTML=''; return; }
-      list.innerHTML = snap.docs.map(d=>{const r=d.data();return`<div class="reply-item"><div class="reply-meta"><span class="reply-nick">~${esc(r.nickname||'anon')}${r.isAdmin?'<span class="admin-badge">✓</span>':''}</span><span class="reply-time">${timeAgo(r.createdAt)}</span></div><div class="reply-text">${esc(r.text)}</div></div>`;}).join('');
-    });
+// Confession of the day
+function getCotdId(confessions){
+  const visible=confessions.filter(c=>!c.pending);
+  if(!visible.length)return null;
+  const today=new Date().toDateString();
+  const seed=today.split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+  const sorted=[...visible].sort((a,b)=>(b.likes||0)-(a.likes||0));
+  const top=sorted.slice(0,Math.min(5,sorted.length));
+  return top[seed%top.length]?.id||null;
+}
+
+// timeAgo
+function timeAgo(ts){
+  if(!ts)return'just now';
+  const s=Math.floor((Date.now()-ts.toMillis())/1000);
+  if(s<60)return'just now';if(s<3600)return`${Math.floor(s/60)}m ago`;
+  if(s<86400)return`${Math.floor(s/3600)}h ago`;return`${Math.floor(s/86400)}d ago`;
+}
+function esc(t){return(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// Render feed
+function renderFeed(confessions){
+  const feed=document.getElementById('feed');
+  const visible=confessions.filter(c=>isAdmin||!c.pending);
+  if(!visible.length){
+    feed.innerHTML=currentSort==='bookmarks'?'<div class="empty">No saved confessions yet.</div>':searchQuery?'<div class="no-results">no results found</div>':'<div class="empty">No confessions yet. Be the first.</div>';
+    return;
   }
+  const cotdId=getCotdId(allConfessions);
+  const pinned=visible.filter(c=>c.pinned);
+  const rest=visible.filter(c=>!c.pinned);
+  feed.innerHTML='';
+  [...pinned,...rest].forEach(conf=>{
+    const isLiked=liked[conf.id],isReported=reported[conf.id],hasReports=(conf.reports||0)>0,isBookmarked=bookmarks[conf.id];
+    const isCotd=conf.id===cotdId&&!conf.pinned;
+    const card=document.createElement('div');
+    card.className=`confession-card${hasReports?' reported-card':''}${conf.pinned?' pinned-card':''}${isCotd?' cotd-card':''}${conf.pending?' pending-card':''}`;
+    card.id=`card-${conf.id}`;
+    const reactionBtns=REACTIONS.map(e=>`<button class="reaction-btn${reacted[conf.id+'_'+e]?' reacted':''}" onclick="toggleReaction('${conf.id}','${e}')">${e}<span class="reaction-count">${conf.reactions?.[e]||0}</span></button>`).join('');
+    card.innerHTML=`
+      ${conf.pinned?'<div class="pin-banner">📌 Pinned</div>':''}
+      ${isCotd?'<div class="cotd-banner">🏆 Confession of the day</div>':''}
+      ${conf.pending?'<div class="pending-banner">⏳ Awaiting approval</div>':''}
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="card-nick">~${esc(conf.nickname||'anon')}${conf.isAdmin?'<span class="admin-badge">✓</span>':''}</span>
+          <span class="card-time">${timeAgo(conf.createdAt)}</span>
+        </div>
+        <div class="card-text">${esc(conf.text)}</div>
+        <div class="reactions-row">${reactionBtns}</div>
+        <div class="card-actions">
+          <button class="action-btn${isLiked?' liked':''}" id="like-${conf.id}" onclick="toggleLike('${conf.id}',${conf.likes||0})">
+            <svg viewBox="0 0 24 24" fill="${isLiked?'currentColor':'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <span id="likes-${conf.id}">${conf.likes||0}</span>
+          </button>
+          <button class="action-btn reply-btn" onclick="toggleReplies('${conf.id}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span id="replycount-${conf.id}">${conf.replyCount||0}</span>
+          </button>
+          <button class="action-btn${isBookmarked?' bookmarked':''}" onclick="toggleBookmark('${conf.id}')">
+            <svg viewBox="0 0 24 24" fill="${isBookmarked?'currentColor':'none'}" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          </button>
+          <button class="action-btn report-btn" onclick="openReport('${conf.id}')" ${isReported?'disabled style="opacity:0.3"':''}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            ${isReported?'reported':'report'}
+          </button>
+          ${hasReports?`<span class="report-badge">${conf.reports} report${conf.reports>1?'s':''}</span>`:''}
+        </div>
+      </div>
+      <div class="replies-section hidden" id="replies-${conf.id}">
+        <div id="replies-list-${conf.id}"></div>
+        <div class="reply-form">
+          <input class="reply-input" id="reply-input-${conf.id}" placeholder="Write a reply..." maxlength="300">
+          <button class="reply-submit" onclick="submitReply('${conf.id}')">reply</button>
+        </div>
+      </div>`;
+    feed.appendChild(card);
+  });
+}
 
-  window.submitReply = async function(confId) {
-    if (siteLocked && !isAdmin) { showToast('site is locked'); return; }
-    const nick = filterText(document.getElementById('nickname').value.trim()||'anon');
-    const input = document.getElementById(`reply-input-${confId}`);
-    const rawText = input.value.trim(); if (!rawText) return;
-    const text = filterText(rawText);
-    input.value = '';
-    await addDoc(collection(db,'confessions',confId,'replies'),{nickname:nick,text,isAdmin:isAdmin,createdAt:serverTimestamp()});
-    await updateDoc(doc(db,'confessions',confId),{replyCount:increment(1)});
-  };
+// Live feed
+onSnapshot(query(collection(db,'confessions'),orderBy('createdAt','desc')),snap=>{
+  allConfessions=snap.docs.map(d=>({id:d.id,...d.data()}));
+  autoDeleteOld(allConfessions);
+  renderSorted();
+});
 
-  let reportTarget = null;
-  window.openReport = function(id) { reportTarget=id; document.getElementById('reportModal').classList.add('active'); };
-  window.closeReport = function() { document.getElementById('reportModal').classList.remove('active'); reportTarget=null; };
-  window.confirmReport = async function() {
-    if (!reportTarget) return;
-    reported[reportTarget]=true; localStorage.setItem('reported',JSON.stringify(reported));
-    await updateDoc(doc(db,'confessions',reportTarget),{reports:increment(1)});
-    closeReport(); showToast('reported — thank you');
-  };
+// Submit
+window.submitConfession = async function(){
+  if(siteLocked&&!isAdmin){showToast('site is locked');return;}
+  if(!isAdmin&&slowmodeDelay>0&&Date.now()-lastPostTime<slowmodeDelay*1000)return;
+  const rawNick=document.getElementById('nickname').value.trim()||'anon';
+  const nick=filterText(rawNick);
+  if(!isAdmin&&bannedNames.includes(nick.toLowerCase())){showToast('this name is banned');return;}
+  const rawText=document.getElementById('confessionText').value.trim();
+  if(!rawText)return;
+  const text=filterText(rawText);
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true;btn.textContent='posting...';
+  try{
+    await addDoc(collection(db,'confessions'),{nickname:nick,text,likes:0,replyCount:0,reports:0,reactions:{},isAdmin,pending:approvalMode&&!isAdmin,createdAt:serverTimestamp()});
+    document.getElementById('confessionText').value='';
+    document.getElementById('charCount').textContent='0';
+    showToast(approvalMode&&!isAdmin?'submitted — awaiting approval':'confession posted');
+    startSlowmode();
+  }catch(e){showToast('error posting');btn.disabled=false;}
+  if(isAdmin||slowmodeDelay<=0){btn.disabled=false;btn.textContent='Post it';}
+  else btn.textContent='Post it';
+};
 
-  window.openAdminLogin = function() {
-    if (isAdmin) { openAdmin(); return; }
+// Like
+window.toggleLike = async function(id,current){
+  if(liked[id])return;
+  liked[id]=true;localStorage.setItem('liked',JSON.stringify(liked));
+  const btn=document.getElementById(`like-${id}`);
+  btn.classList.add('liked');btn.querySelector('svg').setAttribute('fill','currentColor');
+  document.getElementById(`likes-${id}`).textContent=current+1;
+  await updateDoc(doc(db,'confessions',id),{likes:increment(1)});
+};
+
+// Bookmark
+window.toggleBookmark = function(id){
+  bookmarks[id]=!bookmarks[id];
+  if(!bookmarks[id])delete bookmarks[id];
+  localStorage.setItem('bookmarks',JSON.stringify(bookmarks));
+  renderSorted();
+  showToast(bookmarks[id]?'saved':'removed from saved');
+};
+
+// Reaction
+window.toggleReaction = async function(id,emoji){
+  const key=id+'_'+emoji;
+  if(reacted[key])return;
+  reacted[key]=true;localStorage.setItem('reacted',JSON.stringify(reacted));
+  const field=`reactions.${emoji}`;
+  await updateDoc(doc(db,'confessions',id),{[field]:increment(1)});
+};
+
+// Replies
+window.toggleReplies = function(id){
+  const s=document.getElementById(`replies-${id}`);
+  s.classList.toggle('hidden');
+  if(!s.classList.contains('hidden'))loadReplies(id);
+};
+
+function loadReplies(confId){
+  const list=document.getElementById(`replies-list-${confId}`);
+  list.innerHTML='<div class="loading" style="padding:16px 24px">loading...</div>';
+  onSnapshot(query(collection(db,'confessions',confId,'replies'),orderBy('createdAt','asc')),snap=>{
+    if(snap.empty){list.innerHTML='';return;}
+    list.innerHTML=snap.docs.map(d=>{const r=d.data();return`<div class="reply-item"><div class="reply-meta"><span class="reply-nick">~${esc(r.nickname||'anon')}${r.isAdmin?'<span class="admin-badge">✓</span>':''}</span><span class="reply-time">${timeAgo(r.createdAt)}</span></div><div class="reply-text">${esc(r.text)}</div></div>`;}).join('');
+  });
+}
+
+window.submitReply = async function(confId){
+  if(siteLocked&&!isAdmin){showToast('site is locked');return;}
+  const rawNick=document.getElementById('nickname').value.trim()||'anon';
+  const nick=filterText(rawNick);
+  if(!isAdmin&&bannedNames.includes(nick.toLowerCase())){showToast('this name is banned');return;}
+  const input=document.getElementById(`reply-input-${confId}`);
+  const rawText=input.value.trim();if(!rawText)return;
+  const text=filterText(rawText);
+  input.value='';
+  await addDoc(collection(db,'confessions',confId,'replies'),{nickname:nick,text,isAdmin,createdAt:serverTimestamp()});
+  await updateDoc(doc(db,'confessions',confId),{replyCount:increment(1)});
+};
+
+// Report
+let reportTarget=null;
+window.openReport=function(id){reportTarget=id;document.getElementById('reportModal').classList.add('active');};
+window.closeReport=function(){document.getElementById('reportModal').classList.remove('active');reportTarget=null;};
+window.confirmReport=async function(){
+  if(!reportTarget)return;
+  reported[reportTarget]=true;localStorage.setItem('reported',JSON.stringify(reported));
+  await updateDoc(doc(db,'confessions',reportTarget),{reports:increment(1)});
+  closeReport();showToast('reported — thank you');
+};
+
+// Admin login
+window.openAdminLogin=function(){
+  if(isAdmin){openAdmin();return;}
+  document.getElementById('adminPassword').value='';
+  document.getElementById('passwordError').classList.remove('show');
+  document.getElementById('passwordModal').classList.add('active');
+  setTimeout(()=>document.getElementById('adminPassword').focus(),100);
+};
+window.closePasswordModal=function(){document.getElementById('passwordModal').classList.remove('active');};
+window.checkPassword=function(){
+  if(document.getElementById('adminPassword').value===ADMIN_PASSWORD){
+    document.getElementById('passwordModal').classList.remove('active');
+    isAdmin=true;applyLockdown();openAdmin();
+  }else{
+    document.getElementById('passwordError').classList.add('show');
     document.getElementById('adminPassword').value='';
-    document.getElementById('passwordError').classList.remove('show');
-    document.getElementById('passwordModal').classList.add('active');
-    setTimeout(()=>document.getElementById('adminPassword').focus(),100);
-  };
-  window.closePasswordModal = function() { document.getElementById('passwordModal').classList.remove('active'); };
-  window.checkPassword = function() {
-    if (document.getElementById('adminPassword').value===ADMIN_PASSWORD) {
-      document.getElementById('passwordModal').classList.remove('active');
-      isAdmin=true; openAdmin();
-    } else {
-      document.getElementById('passwordError').classList.add('show');
-      document.getElementById('adminPassword').value='';
-      document.getElementById('adminPassword').focus();
-    }
-  };
-
-  window.openAdmin = function() { document.getElementById('adminPanel').classList.add('active'); loadAdminData(); };
-  window.closeAdmin = function() { document.getElementById('adminPanel').classList.remove('active'); };
-  window.switchTab = function(tab) {
-    document.querySelectorAll('.admin-tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&tab==='reported')||(i===1&&tab==='all')||(i===2&&tab==='settings')));
-    document.getElementById('tab-reported').classList.toggle('active',tab==='reported');
-    document.getElementById('tab-all').classList.toggle('active',tab==='all');
-    document.getElementById('tab-settings').classList.toggle('active',tab==='settings');
-    if (tab==='settings') loadSettingsUI();
-  };
-
-  function loadSettingsUI() {
-    document.getElementById('slowmodeSeconds').value = slowmodeDelay;
-    document.getElementById('filterToggle').checked = filterEnabled;
-    document.getElementById('filterStatus').textContent = filterEnabled ? 'on' : 'off';
-    document.getElementById('customWords').value = customWords.join(', ');
-    document.getElementById('lockToggle').checked = siteLocked;
-    document.getElementById('lockStatus').textContent = siteLocked ? 'locked' : 'unlocked';
-    document.getElementById('lockStatus').style.color = siteLocked ? 'var(--red)' : 'var(--text-muted)';
-    const presets = ['Under maintenance. Back soon.','Taking a break. Back later.','Temporarily closed for moderation.'];
-    const preset = document.getElementById('lockReasonPreset');
-    const custom = document.getElementById('lockReasonCustom');
-    if (presets.includes(lockReason)) {
-      preset.value = lockReason;
-      custom.style.display = 'none';
-    } else {
-      preset.value = 'custom';
-      custom.style.display = '';
-      custom.value = lockReason;
-    }
+    document.getElementById('adminPassword').focus();
   }
+};
 
-  window.onPresetChange = function() {
-    const val = document.getElementById('lockReasonPreset').value;
-    const custom = document.getElementById('lockReasonCustom');
-    custom.style.display = val === 'custom' ? '' : 'none';
-    if (val === 'custom') custom.focus();
-  };
+window.openAdmin=function(){document.getElementById('adminPanel').classList.add('active');loadAdminData();};
+window.closeAdmin=function(){document.getElementById('adminPanel').classList.remove('active');};
 
-  window.saveLockReason = function() {
-    const val = document.getElementById('lockReasonPreset').value;
-    if (val === 'custom') {
-      lockReason = document.getElementById('lockReasonCustom').value.trim() || lockReason;
-    } else if (val) {
-      lockReason = val;
-    }
-    localStorage.setItem('lockReason', lockReason);
-    applyLockdown();
-    showToast('lockdown reason saved');
-  };
+window.switchTab=function(tab){
+  const tabs=['reported','pending','all','banned','settings'];
+  document.querySelectorAll('.admin-tab').forEach((t,i)=>t.classList.toggle('active',tabs[i]===tab));
+  tabs.forEach(t=>document.getElementById(`tab-${t}`).classList.toggle('active',t===tab));
+  if(tab==='settings')loadSettingsUI();
+  else if(tab==='banned')renderBannedList();
+  else loadAdminData();
+};
 
-  window.saveLockdown = function() {
-    siteLocked = document.getElementById('lockToggle').checked;
-    localStorage.setItem('siteLocked', siteLocked);
-    document.getElementById('lockStatus').textContent = siteLocked ? 'locked' : 'unlocked';
-    document.getElementById('lockStatus').style.color = siteLocked ? 'var(--red)' : 'var(--text-muted)';
-    applyLockdown();
-    showToast(siteLocked ? '🔒 site locked' : '🔓 site unlocked');
-  };
+async function loadAdminData(){
+  const snap=await getDocs(query(collection(db,'confessions'),orderBy('createdAt','desc')));
+  const all=snap.docs.map(d=>({id:d.id,...d.data()}));
+  const reps=all.filter(c=>(c.reports||0)>0).sort((a,b)=>(b.reports||0)-(a.reports||0));
+  const pend=all.filter(c=>c.pending);
+  renderAdminList('reported-list',reps,true);
+  renderAdminList('pending-list',pend,false,true);
+  renderAdminList('all-list',all,false);
+}
 
-  window.saveSlowmode = function() {
-    slowmodeDelay = parseInt(document.getElementById('slowmodeSeconds').value)||0;
-    localStorage.setItem('slowmodeDelay', slowmodeDelay);
-    showToast(`slowmode set to ${slowmodeDelay}s`);
-  };
-
-  window.saveFilterToggle = function() {
-    filterEnabled = document.getElementById('filterToggle').checked;
-    localStorage.setItem('filterEnabled', filterEnabled);
-    document.getElementById('filterStatus').textContent = filterEnabled ? 'on' : 'off';
-    showToast(`bad word filter ${filterEnabled?'enabled':'disabled'}`);
-  };
-
-  window.saveCustomWords = function() {
-    const val = document.getElementById('customWords').value;
-    customWords = val.split(',').map(w=>w.trim().toLowerCase()).filter(Boolean);
-    localStorage.setItem('customWords', JSON.stringify(customWords));
-    showToast(`${customWords.length} custom word${customWords.length!==1?'s':''} saved`);
-  };
-
-  async function loadAdminData() {
-    const snap = await getDocs(query(collection(db,'confessions'),orderBy('createdAt','desc')));
-    const all = snap.docs.map(d=>({id:d.id,...d.data()}));
-    const reps = all.filter(c=>(c.reports||0)>0).sort((a,b)=>(b.reports||0)-(a.reports||0));
-    renderAdminList('reported-list', reps, true);
-    renderAdminList('all-list', all, false);
-  }
-
-  async function renderAdminList(containerId, items, reportedOnly) {
-    const container = document.getElementById(containerId);
-    if (!items.length) { container.innerHTML=`<div class="admin-empty">${reportedOnly?'no reported confessions':'no confessions yet'}</div>`; return; }
-    container.innerHTML='';
-    for (const conf of items) {
-      const repliesSnap = await getDocs(query(collection(db,'confessions',conf.id,'replies'),orderBy('createdAt','asc')));
-      const replies = repliesSnap.docs.map(d=>({id:d.id,...d.data()}));
-      const card = document.createElement('div');
-      card.className=`admin-card${(conf.reports||0)>0?' has-reports':''}`;
-      card.id=`admin-card-${conf.id}`;
-      card.innerHTML=`
-        <div class="admin-card-meta">
-          <span class="admin-card-nick">~${esc(conf.nickname||'anon')}</span>
-          <div class="admin-card-info">
-            ${(conf.reports||0)>0?`<span class="report-count">⚠ ${conf.reports} report${conf.reports>1?'s':''}</span>`:''}
-            <span class="admin-card-time">${timeAgo(conf.createdAt)}</span>
-          </div>
+async function renderAdminList(containerId,items,reportedOnly,pendingOnly){
+  const container=document.getElementById(containerId);
+  if(!items.length){container.innerHTML=`<div class="admin-empty">${reportedOnly?'no reported confessions':pendingOnly?'no pending confessions':'no confessions yet'}</div>`;return;}
+  container.innerHTML='';
+  for(const conf of items){
+    const repliesSnap=await getDocs(query(collection(db,'confessions',conf.id,'replies'),orderBy('createdAt','asc')));
+    const replies=repliesSnap.docs.map(d=>({id:d.id,...d.data()}));
+    const card=document.createElement('div');
+    card.className=`admin-card${(conf.reports||0)>0?' has-reports':''}${conf.pending?' pending-admin':''}`;
+    card.id=`admin-card-${conf.id}`;
+    card.innerHTML=`
+      <div class="admin-card-meta">
+        <span class="admin-card-nick">~${esc(conf.nickname||'anon')}</span>
+        <div class="admin-card-info">
+          ${(conf.reports||0)>0?`<span class="report-count">⚠ ${conf.reports} report${conf.reports>1?'s':''}</span>`:''}
+          ${conf.pending?'<span class="pending-tag">⏳ pending</span>':''}
+          ${conf.pinned?'<span style="color:var(--gold);font-size:10px;">📌 pinned</span>':''}
+          <span class="admin-card-time">${timeAgo(conf.createdAt)}</span>
         </div>
-        <div class="admin-card-text">${esc(conf.text)}</div>
-        <div class="admin-card-actions">
-          <button class="admin-btn-delete" onclick="deleteConfession('${conf.id}')">Delete post</button>
-          ${(conf.reports||0)>0?`<button class="admin-btn-clear" onclick="clearReports('${conf.id}')">Clear reports</button>`:''}
-        </div>
-        ${replies.length?`<div class="admin-replies">
-          <div style="font-size:10px;letter-spacing:0.15em;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase">Replies (${replies.length})</div>
-          ${replies.map(r=>`<div class="admin-reply-item" id="admin-reply-${r.id}">
-            <div><div class="admin-reply-nick">~${esc(r.nickname||'anon')}</div><div class="admin-reply-text">${esc(r.text)}</div></div>
-            <button class="admin-btn-delete-reply" onclick="deleteReply('${conf.id}','${r.id}')">Delete</button>
-          </div>`).join('')}
-        </div>`:''}`;
-      container.appendChild(card);
-    }
+      </div>
+      <div class="admin-card-text">${esc(conf.text)}</div>
+      <div class="admin-card-actions">
+        ${conf.pending?`<button class="admin-btn admin-btn-approve" onclick="approveConfession('${conf.id}')">Approve</button>`:''}
+        <button class="admin-btn admin-btn-delete" onclick="deleteConfession('${conf.id}')">Delete</button>
+        <button class="admin-btn admin-btn-pin" onclick="togglePin('${conf.id}',${!!conf.pinned})">${conf.pinned?'Unpin':'Pin'}</button>
+        ${(conf.reports||0)>0?`<button class="admin-btn admin-btn-clear" onclick="clearReports('${conf.id}')">Clear reports</button>`:''}
+      </div>
+      ${replies.length?`<div class="admin-replies">
+        <div style="font-size:10px;letter-spacing:0.15em;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase">Replies (${replies.length})</div>
+        ${replies.map(r=>`<div class="admin-reply-item" id="admin-reply-${r.id}">
+          <div><div class="admin-reply-nick">~${esc(r.nickname||'anon')}</div><div class="admin-reply-text">${esc(r.text)}</div></div>
+          <button class="admin-btn-delete-reply" onclick="deleteReply('${conf.id}','${r.id}')">Delete</button>
+        </div>`).join('')}
+      </div>`:''}`;
+    container.appendChild(card);
   }
+}
 
-  window.deleteConfession = async function(id) {
-    if (!confirm('Delete this confession and all its replies?')) return;
-    const rs = await getDocs(collection(db,'confessions',id,'replies'));
-    for (const r of rs.docs) await deleteDoc(r.ref);
-    await deleteDoc(doc(db,'confessions',id));
-    document.getElementById(`admin-card-${id}`)?.remove();
-    showToast('confession deleted');
-  };
+window.approveConfession=async function(id){
+  await updateDoc(doc(db,'confessions',id),{pending:false});
+  document.getElementById(`admin-card-${id}`)?.remove();
+  showToast('confession approved');
+};
 
-  window.deleteReply = async function(confId, replyId) {
-    await deleteDoc(doc(db,'confessions',confId,'replies',replyId));
-    await updateDoc(doc(db,'confessions',confId),{replyCount:increment(-1)});
-    document.getElementById(`admin-reply-${replyId}`)?.remove();
-    showToast('reply deleted');
-  };
+window.togglePin=async function(id,isPinned){
+  await updateDoc(doc(db,'confessions',id),{pinned:!isPinned});
+  showToast(isPinned?'unpinned':'📌 pinned');
+  loadAdminData();
+};
 
-  window.clearReports = async function(id) {
-    await updateDoc(doc(db,'confessions',id),{reports:0});
-    document.getElementById(`admin-card-${id}`)?.remove();
-    showToast('reports cleared');
-  };
+window.deleteConfession=async function(id){
+  if(!confirm('Delete this confession and all its replies?'))return;
+  const rs=await getDocs(collection(db,'confessions',id,'replies'));
+  for(const r of rs.docs)await deleteDoc(r.ref);
+  await deleteDoc(doc(db,'confessions',id));
+  document.getElementById(`admin-card-${id}`)?.remove();
+  showToast('confession deleted');
+};
 
-  function showToast(msg) {
-    const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
-    setTimeout(()=>t.classList.remove('show'),2500);
-  }
+window.deleteReply=async function(confId,replyId){
+  await deleteDoc(doc(db,'confessions',confId,'replies',replyId));
+  await updateDoc(doc(db,'confessions',confId),{replyCount:increment(-1)});
+  document.getElementById(`admin-reply-${replyId}`)?.remove();
+  showToast('reply deleted');
+};
 
-  document.getElementById('confessionText').addEventListener('input',function(){document.getElementById('charCount').textContent=this.value.length;});
-  document.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.classList.contains('reply-input'))window.submitReply(e.target.id.replace('reply-input-',''));});
+window.clearReports=async function(id){
+  await updateDoc(doc(db,'confessions',id),{reports:0});
+  document.getElementById(`admin-card-${id}`)?.remove();
+  showToast('reports cleared');
+};
+
+// Banned names
+function renderBannedList(){
+  const el=document.getElementById('banned-list');
+  if(!bannedNames.length){el.innerHTML='<div class="admin-empty">no banned names</div>';return;}
+  el.innerHTML=bannedNames.map(n=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
+    <span style="color:var(--red);font-size:12px;">~${esc(n)}</span>
+    <button class="admin-btn-delete-reply" onclick="unbanNickname('${esc(n)}')">Unban</button>
+  </div>`).join('');
+}
+
+window.banNickname=function(){
+  const val=document.getElementById('banInput').value.trim().toLowerCase();
+  if(!val)return;
+  if(!bannedNames.includes(val))bannedNames.push(val);
+  localStorage.setItem('bannedNames',JSON.stringify(bannedNames));
+  document.getElementById('banInput').value='';
+  renderBannedList();
+  showToast(`~${val} banned`);
+};
+
+window.unbanNickname=function(name){
+  bannedNames=bannedNames.filter(n=>n!==name);
+  localStorage.setItem('bannedNames',JSON.stringify(bannedNames));
+  renderBannedList();
+  showToast(`~${name} unbanned`);
+};
+
+// Settings
+function loadSettingsUI(){
+  document.getElementById('slowmodeSeconds').value=slowmodeDelay;
+  document.getElementById('filterToggle').checked=filterEnabled;
+  document.getElementById('filterStatus').textContent=filterEnabled?'on':'off';
+  document.getElementById('customWords').value=customWords.join(', ');
+  document.getElementById('lockToggle').checked=siteLocked;
+  document.getElementById('lockStatus').textContent=siteLocked?'locked':'unlocked';
+  document.getElementById('lockStatus').style.color=siteLocked?'var(--red)':'var(--text-muted)';
+  document.getElementById('approvalToggle').checked=approvalMode;
+  document.getElementById('approvalStatus').textContent=approvalMode?'on':'off';
+  document.getElementById('autoDeleteDays').value=autoDeleteDays;
+  const presets=['Under maintenance. Back soon.','Taking a break. Back later.','Temporarily closed for moderation.'];
+  const preset=document.getElementById('lockReasonPreset'),custom=document.getElementById('lockReasonCustom');
+  if(presets.includes(lockReason)){preset.value=lockReason;custom.style.display='none';}
+  else{preset.value='custom';custom.style.display='';custom.value=lockReason;}
+}
+
+window.saveLockdown=function(){
+  siteLocked=document.getElementById('lockToggle').checked;
+  localStorage.setItem('siteLocked',siteLocked);
+  document.getElementById('lockStatus').textContent=siteLocked?'locked':'unlocked';
+  document.getElementById('lockStatus').style.color=siteLocked?'var(--red)':'var(--text-muted)';
+  applyLockdown();showToast(siteLocked?'🔒 site locked':'🔓 site unlocked');
+};
+
+window.onPresetChange=function(){
+  const val=document.getElementById('lockReasonPreset').value;
+  const custom=document.getElementById('lockReasonCustom');
+  custom.style.display=val==='custom'?'':'none';
+  if(val==='custom')custom.focus();
+};
+
+window.saveLockReason=function(){
+  const val=document.getElementById('lockReasonPreset').value;
+  if(val==='custom')lockReason=document.getElementById('lockReasonCustom').value.trim()||lockReason;
+  else if(val)lockReason=val;
+  localStorage.setItem('lockReason',lockReason);applyLockdown();showToast('lockdown reason saved');
+};
+
+window.saveApprovalMode=function(){
+  approvalMode=document.getElementById('approvalToggle').checked;
+  localStorage.setItem('approvalMode',approvalMode);
+  document.getElementById('approvalStatus').textContent=approvalMode?'on':'off';
+  applyLockdown();showToast(`approval mode ${approvalMode?'on':'off'}`);
+};
+
+window.saveAutoDelete=function(){
+  autoDeleteDays=parseInt(document.getElementById('autoDeleteDays').value)||0;
+  localStorage.setItem('autoDeleteDays',autoDeleteDays);
+  showToast(autoDeleteDays?`posts older than ${autoDeleteDays}d will be removed`:'auto-delete disabled');
+};
+
+window.saveSlowmode=function(){
+  slowmodeDelay=parseInt(document.getElementById('slowmodeSeconds').value)||0;
+  localStorage.setItem('slowmodeDelay',slowmodeDelay);showToast(`slowmode set to ${slowmodeDelay}s`);
+};
+
+window.saveFilterToggle=function(){
+  filterEnabled=document.getElementById('filterToggle').checked;
+  localStorage.setItem('filterEnabled',filterEnabled);
+  document.getElementById('filterStatus').textContent=filterEnabled?'on':'off';
+  showToast(`bad word filter ${filterEnabled?'enabled':'disabled'}`);
+};
+
+window.saveCustomWords=function(){
+  const val=document.getElementById('customWords').value;
+  customWords=val.split(',').map(w=>w.trim().toLowerCase()).filter(Boolean);
+  localStorage.setItem('customWords',JSON.stringify(customWords));
+  showToast(`${customWords.length} custom word${customWords.length!==1?'s':''} saved`);
+};
+
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+document.getElementById('confessionText').addEventListener('input',function(){document.getElementById('charCount').textContent=this.value.length;});
+document.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.classList.contains('reply-input'))window.submitReply(e.target.id.replace('reply-input-',''));});
 </script>
 </body>
 </html>
