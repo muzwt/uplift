@@ -252,6 +252,7 @@
   .profile-post-meta{display:flex;gap:12px;font-size:11px;color:var(--text-dim);}
   .profile-close{background:none;border:1px solid var(--border);color:var(--text-muted);font-family:'DM Mono',monospace;font-size:11px;padding:6px 14px;cursor:pointer;border-radius:8px;transition:all 0.2s;float:right;}
   .profile-close:hover{border-color:#444;color:var(--text);}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg3);border:1px solid var(--border);color:var(--text-muted);font-size:11px;letter-spacing:0.1em;padding:10px 20px;border-radius:10px;transition:transform 0.3s ease;z-index:9000;white-space:nowrap;}
   .toast.show{transform:translateX(-50%) translateY(0);}
   .loading{text-align:center;color:var(--text-dim);padding:40px;font-size:11px;letter-spacing:0.2em;}
   .empty{text-align:center;color:var(--text-dim);padding:60px 20px;font-family:"Syne",sans-serif;font-weight:600;font-size:16px;}
@@ -1613,8 +1614,8 @@ window.openProfile = async function(username, e){
     <div class="profile-post-item" onclick="closeProfile();document.getElementById('card-${p.id}')?.scrollIntoView({behavior:'smooth',block:'center'})">
       <div class="profile-post-text">${esc(p.text)}</div>
       <div class="profile-post-meta">
-        <span>♥ ${p.likes||0}</span>
-        <span>💬 ${p.replyCount||0}</span>
+        <span style="display:flex;align-items:center;gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> ${p.likes||0}</span>
+        <span style="display:flex;align-items:center;gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> ${p.replyCount||0}</span>
         <span>${timeAgo(p.createdAt)}</span>
       </div>
     </div>`).join('');
