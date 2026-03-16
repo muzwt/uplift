@@ -309,7 +309,6 @@
       <button class="admin-tab" onclick="switchTab('pending')">Pending</button>
       <button class="admin-tab" onclick="switchTab('all')">All posts</button>
       <button class="admin-tab" onclick="switchTab('log')">Activity log</button>
-      <button class="admin-tab" onclick="switchTab('banned')">Banned</button>
       <button class="admin-tab" onclick="switchTab('settings')">Settings</button>
     </div>
     <div class="admin-section active" id="tab-reported"><div id="reported-list"><div class="admin-empty">loading...</div></div></div>
@@ -321,13 +320,6 @@
         <button class="admin-btn-clear admin-btn" onclick="clearLog()" style="font-size:10px;padding:5px 12px;">Clear log</button>
       </div>
       <div id="activity-log-list"></div>
-    </div>
-    <div class="admin-section" id="tab-banned">
-      <div id="banned-list"></div>
-      <div style="margin-top:16px;display:flex;gap:8px;">
-        <input type="text" id="banInput" placeholder="nickname to ban" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:12px;padding:8px 12px;outline:none;flex:1;" onfocus="this.style.borderColor='var(--red)'" onblur="this.style.borderColor='var(--border)'">
-        <button class="admin-btn admin-btn-delete" onclick="banNickname()">Ban</button>
-      </div>
     </div>
     <div class="admin-section" id="tab-settings">
       <div class="admin-settings">
@@ -396,6 +388,14 @@
             <input type="text" id="customWords" placeholder="word1, word2, word3" class="settings-text-input" onfocus="this.style.borderColor='var(--admin)'" onblur="this.style.borderColor='var(--border)'">
             <button class="settings-save" onclick="saveCustomWords()">Save</button>
           </div>
+        </div>
+        <div class="settings-row" style="flex-direction:column;align-items:stretch;gap:12px;">
+          <div><div class="settings-label">Banned nicknames</div><div class="settings-desc">These names cannot post or reply</div></div>
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="banInput" placeholder="nickname to ban" class="settings-text-input" style="flex:1;width:auto;" onfocus="this.style.borderColor='var(--red)'" onblur="this.style.borderColor='var(--border)'">
+            <button class="admin-btn admin-btn-delete" onclick="banNickname()" style="border-radius:8px;">Ban</button>
+          </div>
+          <div id="banned-list"></div>
         </div>
       </div>
     </div>
@@ -878,11 +878,10 @@ window.openAdmin=function(){document.getElementById('adminPanel').classList.add(
 window.closeAdmin=function(){document.getElementById('adminPanel').classList.remove('active');};
 
 window.switchTab=function(tab){
-  const tabs=['reported','pending','all','log','banned','settings'];
+  const tabs=['reported','pending','all','log','settings'];
   document.querySelectorAll('.admin-tab').forEach((t,i)=>t.classList.toggle('active',tabs[i]===tab));
   tabs.forEach(t=>document.getElementById(`tab-${t}`).classList.toggle('active',t===tab));
-  if(tab==='settings')loadSettingsUI();
-  else if(tab==='banned')renderBannedList();
+  if(tab==='settings'){loadSettingsUI();renderBannedList();}
   else if(tab==='log')renderActivityLog();
   else loadAdminData();
 };
@@ -922,6 +921,7 @@ async function renderAdminList(containerId,items,reportedOnly,pendingOnly){
         ${conf.pending?`<button class="admin-btn admin-btn-approve" onclick="approveConfession('${conf.id}')">Approve</button>`:''}
         <button class="admin-btn admin-btn-delete" onclick="deleteConfession('${conf.id}')">Delete</button>
         <button class="admin-btn admin-btn-pin" onclick="togglePin('${conf.id}',${!!conf.pinned})">${conf.pinned?'Unpin':'Pin'}</button>
+        <button class="admin-btn" style="background:var(--red-dim);border:1px solid rgba(255,80,80,0.3);color:var(--red);" onclick="banFromCard('${esc(conf.nickname||'anon')}')">Ban user</button>
         ${(conf.reports||0)>0?`<button class="admin-btn admin-btn-clear" onclick="clearReports('${conf.id}')">Clear reports</button>`:''}
       </div>
       ${replies.length?`<div class="admin-replies">
@@ -1000,8 +1000,9 @@ window.clearLog=function(){
 // Banned names
 function renderBannedList(){
   const el=document.getElementById('banned-list');
-  if(!bannedNames.length){el.innerHTML='<div class="admin-empty">no banned names</div>';return;}
-  el.innerHTML=bannedNames.map(n=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
+  if(!el)return;
+  if(!bannedNames.length){el.innerHTML='<div style="color:var(--text-dim);font-size:11px;padding:8px 0;">no banned names</div>';return;}
+  el.innerHTML=bannedNames.map(n=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
     <span style="color:var(--red);font-size:12px;">~${esc(n)}</span>
     <button class="admin-btn-delete-reply" onclick="unbanNickname('${esc(n)}')">Unban</button>
   </div>`).join('');
@@ -1013,6 +1014,14 @@ window.banNickname=function(){
   if(!bannedNames.includes(val))bannedNames.push(val);
   localStorage.setItem('bannedNames',JSON.stringify(bannedNames));
   document.getElementById('banInput').value='';
+  renderBannedList();
+  showToast(`~${val} banned`);
+};
+
+window.banFromCard=function(nick){
+  const val=nick.toLowerCase();
+  if(!bannedNames.includes(val))bannedNames.push(val);
+  localStorage.setItem('bannedNames',JSON.stringify(bannedNames));
   renderBannedList();
   showToast(`~${val} banned`);
 };
