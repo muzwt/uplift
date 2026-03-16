@@ -15,35 +15,18 @@
     --admin:#e8a24a;--admin-dim:rgba(232,162,74,0.1);
     --gold:#f5c842;--gold-dim:rgba(245,200,66,0.1);
   }
-  body.light {
-    --bg:#f5f4f0;--bg2:#ffffff;--bg3:#eceae4;
-    --border:rgba(0,0,0,0.08);--border-hover:rgba(0,0,0,0.15);
-    --text:#1a1a1e;--text-muted:#888580;--text-dim:#c0bdb8;
-    --accent:#7b5fbf;--accent-dim:rgba(123,95,191,0.1);
-    --red:#b03050;--red-dim:rgba(176,48,80,0.08);--heart:#b03050;
-    --admin:#c07820;--admin-dim:rgba(192,120,32,0.1);
-    --gold:#c09820;--gold-dim:rgba(192,152,32,0.1);
-  }
   *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;font-size:13px;min-height:100vh;overflow-x:hidden;transition:background 0.3s,color 0.3s;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;font-size:13px;min-height:100vh;overflow-x:hidden;}
   body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 30% 20%,rgba(157,127,212,0.04) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(196,85,106,0.03) 0%,transparent 50%);pointer-events:none;z-index:0;}
   .container{max-width:680px;margin:0 auto;padding:0 20px;position:relative;z-index:1;}
-  header{padding:60px 0 40px;border-bottom:1px solid var(--border);margin-bottom:48px;display:flex;justify-content:space-between;align-items:flex-end;}
-  .header-left{}
+  header{padding:60px 0 40px;border-bottom:1px solid var(--border);margin-bottom:48px;}
   .logo{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;letter-spacing:0.1em;margin-bottom:6px;}
   .logo span{color:var(--accent);font-style:italic;}
   .tagline{color:var(--text-muted);font-size:11px;letter-spacing:0.15em;text-transform:uppercase;}
-  .header-right{display:flex;align-items:center;gap:10px;padding-bottom:4px;}
-  .theme-btn{background:none;border:1px solid var(--border);color:var(--text-muted);font-size:14px;width:32px;height:32px;cursor:pointer;border-radius:2px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
-  .theme-btn:hover{border-color:var(--border-hover);color:var(--text);}
-  .search-wrap{position:relative;}
-  .search-btn{background:none;border:1px solid var(--border);color:var(--text-muted);font-size:14px;width:32px;height:32px;cursor:pointer;border-radius:2px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
-  .search-btn:hover{border-color:var(--border-hover);color:var(--text);}
-  .search-box{position:absolute;top:38px;right:0;width:240px;background:var(--bg2);border:1px solid var(--border);border-radius:2px;padding:10px 12px;display:none;z-index:10;}
-  .search-box.open{display:block;}
-  .search-input{width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:12px;padding:4px 0;outline:none;}
-  .search-input:focus{border-bottom-color:var(--accent);}
-  .search-input::placeholder{color:var(--text-dim);}
+  .topic-banner{background:var(--accent-dim);border:1px solid rgba(157,127,212,0.2);border-radius:2px;padding:12px 20px;margin-bottom:32px;display:none;align-items:center;gap:10px;}
+  .topic-banner.active{display:flex;}
+  .topic-label{font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);flex-shrink:0;}
+  .topic-text{font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;color:var(--text);}
   .locked-banner{background:rgba(196,85,106,0.08);border:1px solid rgba(196,85,106,0.25);border-radius:2px;padding:14px 20px;margin-bottom:32px;display:none;align-items:center;gap:12px;}
   .locked-banner.active{display:flex;}
   .locked-banner-icon{color:var(--red);font-size:16px;flex-shrink:0;}
@@ -83,9 +66,8 @@
   .confession-card.pending-card{opacity:0.6;border-style:dashed;}
   @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
   .confession-card:hover{border-color:var(--border-hover);}
-  .confession-card.pinned-card:hover,.confession-card.cotd-card:hover{border-color:var(--gold);}
+  .confession-card.pinned-card:hover{border-color:var(--gold);}
   .pin-banner{background:var(--gold-dim);padding:6px 24px;font-size:10px;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;border-bottom:1px solid rgba(245,200,66,0.15);}
-  .cotd-banner{background:var(--gold-dim);padding:6px 24px;font-size:10px;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;border-bottom:1px solid rgba(245,200,66,0.15);}
   .pending-banner{background:var(--admin-dim);padding:6px 24px;font-size:10px;color:var(--admin);letter-spacing:0.15em;text-transform:uppercase;border-bottom:1px solid rgba(232,162,74,0.15);}
   .card-body{padding:20px 24px;}
   .card-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
@@ -211,20 +193,14 @@
 <body>
 <div class="container">
   <header>
-    <div class="header-left">
-      <div class="logo">Say It <span>Anonymously</span></div>
-      <div class="tagline">No names. No judgment. Just honesty.</div>
-    </div>
-    <div class="header-right">
-      <div class="search-wrap">
-        <button class="search-btn" onclick="toggleSearch()" title="Search">🔍</button>
-        <div class="search-box" id="searchBox">
-          <input class="search-input" id="searchInput" placeholder="search confessions..." oninput="doSearch(this.value)">
-        </div>
-      </div>
-      <button class="theme-btn" onclick="toggleTheme()" id="themeBtn" title="Toggle theme">🌙</button>
-    </div>
+    <div class="logo">Say It <span>Anonymously</span></div>
+    <div class="tagline">No names. No judgment. Just honesty.</div>
   </header>
+
+  <div class="topic-banner" id="topicBanner">
+    <span class="topic-label">Today's topic</span>
+    <span class="topic-text" id="topicText"></span>
+  </div>
 
   <div class="locked-banner" id="lockedBanner">
     <span class="locked-banner-icon">🔒</span>
@@ -254,8 +230,8 @@
     <div class="feed-line"></div>
     <div class="sort-tabs">
       <button class="sort-tab active" id="tab-new" onclick="setSort('new')">New</button>
-      <button class="sort-tab" id="tab-hot" onclick="setSort('hot')">🔥 Hot</button>
-      <button class="sort-tab" id="tab-bookmarks" onclick="setSort('bookmarks')">🔖 Saved</button>
+      <button class="sort-tab" id="tab-hot" onclick="setSort('hot')">Hot</button>
+      <button class="sort-tab" id="tab-bookmarks" onclick="setSort('bookmarks')">Saved</button>
     </div>
   </div>
 
@@ -294,6 +270,16 @@
     </div>
     <div class="admin-section" id="tab-settings">
       <div class="admin-settings">
+        <div class="settings-row">
+          <div><div class="settings-label">Daily topic</div><div class="settings-desc">Show a prompt above the confession form</div></div>
+          <div class="settings-control" style="flex-direction:column;align-items:flex-end;gap:8px;">
+            <input type="text" id="dailyTopic" placeholder="e.g. What's your biggest regret?" maxlength="120" class="settings-text-input" onfocus="this.style.borderColor='var(--admin)'" onblur="this.style.borderColor='var(--border)'">
+            <div style="display:flex;gap:8px;">
+              <button class="settings-save" onclick="saveDailyTopic()">Set topic</button>
+              <button class="admin-btn-clear admin-btn" onclick="clearDailyTopic()" style="font-size:10px;padding:6px 14px;">Clear</button>
+            </div>
+          </div>
+        </div>
         <div class="settings-row">
           <div><div class="settings-label">Lock down site</div><div class="settings-desc">Prevent all new posts and replies</div></div>
           <div class="toggle-wrap">
@@ -399,7 +385,6 @@ const ADMIN_PASSWORD = "Oranges";
 let isAdmin = false;
 let allConfessions = [];
 let currentSort = 'new';
-let searchQuery = '';
 
 // localStorage state
 const liked = JSON.parse(localStorage.getItem('liked')||'{}');
@@ -413,38 +398,17 @@ let lockReason = localStorage.getItem('lockReason')||'This site is currently loc
 let approvalMode = localStorage.getItem('approvalMode')==='true';
 let autoDeleteDays = parseInt(localStorage.getItem('autoDeleteDays')||'0');
 let bannedNames = JSON.parse(localStorage.getItem('bannedNames')||'[]');
-let lightMode = localStorage.getItem('lightMode')==='true';
+let dailyTopic = localStorage.getItem('dailyTopic')||'';
 let lastPostTime = 0;
 
-// Theme
-if(lightMode){document.body.classList.add('light');document.getElementById('themeBtn').textContent='☀️';}
-
-window.toggleTheme = function(){
-  lightMode=!lightMode;
-  document.body.classList.toggle('light',lightMode);
-  document.getElementById('themeBtn').textContent=lightMode?'☀️':'🌙';
-  localStorage.setItem('lightMode',lightMode);
-};
-
-// Search
-window.toggleSearch = function(){
-  const box=document.getElementById('searchBox');
-  box.classList.toggle('open');
-  if(box.classList.contains('open'))document.getElementById('searchInput').focus();
-  else{searchQuery='';document.getElementById('searchInput').value='';renderSorted();}
-};
-
-window.doSearch = function(val){
-  searchQuery=val.toLowerCase();
-  renderSorted();
-};
-
-document.addEventListener('click',e=>{
-  const wrap=document.querySelector('.search-wrap');
-  if(!wrap.contains(e.target)){
-    document.getElementById('searchBox').classList.remove('open');
-  }
-});
+// Daily topic
+function applyDailyTopic(){
+  const banner=document.getElementById('topicBanner');
+  const text=document.getElementById('topicText');
+  if(dailyTopic){banner.classList.add('active');text.textContent=dailyTopic;}
+  else{banner.classList.remove('active');}
+}
+applyDailyTopic();
 
 // Sort
 window.setSort = function(s){
@@ -457,7 +421,6 @@ window.setSort = function(s){
 function renderSorted(){
   let list=[...allConfessions];
   if(currentSort==='bookmarks') list=list.filter(c=>bookmarks[c.id]);
-  if(searchQuery) list=list.filter(c=>(c.text||'').toLowerCase().includes(searchQuery)||(c.nickname||'').toLowerCase().includes(searchQuery));
   if(currentSort==='hot') list.sort((a,b)=>((b.likes||0)+(b.replyCount||0)*2)-((a.likes||0)+(a.replyCount||0)*2));
   renderFeed(list);
 }
@@ -514,17 +477,6 @@ function autoDeleteOld(confessions){
   });
 }
 
-// Confession of the day
-function getCotdId(confessions){
-  const visible=confessions.filter(c=>!c.pending);
-  if(!visible.length)return null;
-  const today=new Date().toDateString();
-  const seed=today.split('').reduce((a,c)=>a+c.charCodeAt(0),0);
-  const sorted=[...visible].sort((a,b)=>(b.likes||0)-(a.likes||0));
-  const top=sorted.slice(0,Math.min(5,sorted.length));
-  return top[seed%top.length]?.id||null;
-}
-
 // timeAgo
 function timeAgo(ts){
   if(!ts)return'just now';
@@ -542,20 +494,17 @@ function renderFeed(confessions){
     feed.innerHTML=currentSort==='bookmarks'?'<div class="empty">No saved confessions yet.</div>':searchQuery?'<div class="no-results">no results found</div>':'<div class="empty">No confessions yet. Be the first.</div>';
     return;
   }
-  const cotdId=getCotdId(allConfessions);
   const pinned=visible.filter(c=>c.pinned);
   const rest=visible.filter(c=>!c.pinned);
   feed.innerHTML='';
   [...pinned,...rest].forEach(conf=>{
     const isLiked=liked[conf.id],isReported=reported[conf.id],hasReports=(conf.reports||0)>0,isBookmarked=bookmarks[conf.id];
-    const isCotd=conf.id===cotdId&&!conf.pinned;
     const card=document.createElement('div');
-    card.className=`confession-card${hasReports?' reported-card':''}${conf.pinned?' pinned-card':''}${isCotd?' cotd-card':''}${conf.pending?' pending-card':''}`;
+    card.className=`confession-card${hasReports?' reported-card':''}${conf.pinned?' pinned-card':''}${conf.pending?' pending-card':''}`;
     card.id=`card-${conf.id}`;
     card.innerHTML=`
-      ${conf.pinned?'<div class="pin-banner">📌 Pinned</div>':''}
-      ${isCotd?'<div class="cotd-banner">🏆 Confession of the day</div>':''}
-      ${conf.pending?'<div class="pending-banner">⏳ Awaiting approval</div>':''}
+      ${conf.pinned?'<div class="pin-banner">Pinned</div>':''}
+      ${conf.pending?'<div class="pending-banner">Awaiting approval</div>':''}
       <div class="card-body">
         <div class="card-meta">
           <span class="card-nick">~${esc(conf.nickname||'anon')}${conf.isAdmin?'<span class="admin-badge">✓</span>':''}</span>
@@ -844,7 +793,7 @@ function loadSettingsUI(){
   document.getElementById('lockStatus').style.color=siteLocked?'var(--red)':'var(--text-muted)';
   document.getElementById('approvalToggle').checked=approvalMode;
   document.getElementById('approvalStatus').textContent=approvalMode?'on':'off';
-  document.getElementById('autoDeleteDays').value=autoDeleteDays;
+  document.getElementById('dailyTopic').value=dailyTopic;
   const presets=['Under maintenance. Back soon.','Taking a break. Back later.','Temporarily closed for moderation.'];
   const preset=document.getElementById('lockReasonPreset'),custom=document.getElementById('lockReasonCustom');
   if(presets.includes(lockReason)){preset.value=lockReason;custom.style.display='none';}
