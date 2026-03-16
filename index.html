@@ -763,23 +763,28 @@ window.clearNotifications = function(){
 };
 
 function watchOwnedReplies(){
-  Object.keys(myTokens).forEach(confId=>{
-    onSnapshot(query(collection(db,'confessions',confId,'replies'),orderBy('createdAt','asc')),snap=>{
-      const count=snap.size;
-      const prev=seenReplyCounts[confId]??null;
-      if(prev!==null&&count>prev){
-        snap.docs.slice(prev).forEach(d=>{
-          const r=d.data();
-          if(!currentUser||r.nickname!==currentUser.username||anonMode){
+  if(!currentUser) return;
+  // Watch posts where the logged-in user is the real author
+  onSnapshot(query(collection(db,'confessions'),where('realUsername','==',currentUser.username)),snap=>{
+    snap.docs.forEach(d=>{
+      const confId=d.id;
+      onSnapshot(query(collection(db,'confessions',confId,'replies'),orderBy('createdAt','asc')),rSnap=>{
+        const count=rSnap.size;
+        const prev=seenReplyCounts[confId]??null;
+        if(prev!==null&&count>prev){
+          rSnap.docs.slice(prev).forEach(rd=>{
+            const r=rd.data();
+            // Don't notify for your own replies
+            if(r.realUsername===currentUser.username) return;
             const conf=allConfessions.find(c=>c.id===confId);
             addNotification(confId,conf?.text||'',r.text||'',r.nickname||'anonymous');
-          }
-        });
-      }
-      if(prev===null||count!==prev){
-        seenReplyCounts[confId]=count;
-        localStorage.setItem('seenReplyCounts',JSON.stringify(seenReplyCounts));
-      }
+          });
+        }
+        if(prev===null||count!==prev){
+          seenReplyCounts[confId]=count;
+          localStorage.setItem('seenReplyCounts',JSON.stringify(seenReplyCounts));
+        }
+      });
     });
   });
 }
@@ -978,7 +983,7 @@ window.submitConfession = async function(){
   const btn=document.getElementById('submitBtn');
   btn.disabled=true; btn.textContent='posting...';
   try{
-    const ref=await addDoc(collection(db,'confessions'),{nickname:nick,realUsername:currentUser.username,text,likes:0,replyCount:0,reports:0,isAdmin,pending:approvalMode&&!isAdmin,browserId,createdAt:serverTimestamp()});
+    const ref=await addDoc(collection(db,'confessions'),{nickname:nick,realUsername:currentUser.username,posterUsername:currentUser.username,text,likes:0,replyCount:0,reports:0,isAdmin,pending:approvalMode&&!isAdmin,browserId,createdAt:serverTimestamp()});
     myTokens[ref.id]=token;
     localStorage.setItem('myTokens',JSON.stringify(myTokens));
     localStorage.setItem('myNick',nick);
@@ -1023,7 +1028,7 @@ function loadReplies(confId,confNick){
     if(snap.empty){list.innerHTML='';return;}
     list.innerHTML=snap.docs.map(d=>{
       const r=d.data();
-      const isOP=confNick&&r.nickname&&currentUser&&r.nickname===currentUser.username&&!anonMode&&myTokens[confId];
+      const isOP=currentUser&&r.realUsername&&r.realUsername===currentUser.username;
       return`<div class="reply-item"><div class="reply-meta"><span class="reply-nick">~${esc(r.nickname||'anonymous')}${isOP?'<span class="op-badge">OP</span>':''}</span><span class="reply-time">${timeAgo(r.createdAt)}</span></div><div class="reply-text">${esc(r.text)}</div></div>`;
     }).join('');
   });
