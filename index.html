@@ -416,8 +416,10 @@
       <div id="activity-log-list"></div>
     </div>
     <div class="admin-section" id="tab-bans">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-        <span style="font-size:10px;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;">Banned users</span>
+      <div style="display:flex;gap:8px;margin-bottom:20px;">
+        <input type="text" id="banUsernameInput" placeholder="username to ban" class="settings-text-input" style="flex:1;" onfocus="this.style.borderColor='var(--red)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter')banByUsername()">
+        <input type="text" id="banReasonManual" placeholder="reason (optional)" class="settings-text-input" style="flex:1;" onfocus="this.style.borderColor='var(--red)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter')banByUsername()">
+        <button class="admin-btn admin-btn-delete" onclick="banByUsername()" style="border-radius:8px;white-space:nowrap;">Ban</button>
       </div>
       <div id="bans-list"><div class="admin-empty">no banned users</div></div>
     </div>
@@ -1378,11 +1380,25 @@ window.unbanAll=async function(index){
   showToast('ban removed');
 };
 
+window.banByUsername = async function(){
+  const val = document.getElementById('banUsernameInput').value.trim().toLowerCase();
+  const reason = document.getElementById('banReasonManual').value.trim();
+  if(!val){showToast('enter a username');return;}
+  if(bannedNames.some(b=>(b.name||b)===val)){showToast(`~${val} is already banned`);return;}
+  bannedNames.push({name:val, reason});
+  await setDoc(doc(db,'siteSettings','config'),{bannedNames},{merge:true});
+  document.getElementById('banUsernameInput').value='';
+  document.getElementById('banReasonManual').value='';
+  renderBansTab();
+  showToast(`~${val} banned`);
+};
+
 // Accounts tab
 async function loadAccountsTab(){
   const el=document.getElementById('accounts-list');
   el.innerHTML='<div class="admin-empty">loading...</div>';
-  const snap=await getDocs(query(collection(db,'users'),orderBy('createdAt','asc')));
+  try{
+    const snap=await getDocs(collection(db,'users'));
   if(snap.empty){el.innerHTML='<div class="admin-empty">no accounts yet</div>';return;}
   el.innerHTML=snap.docs.map(d=>{
     const u=d.data();
@@ -1413,6 +1429,7 @@ async function loadAccountsTab(){
       </div>
     </div>`;
   }).join('');
+  }catch(e){el.innerHTML=`<div class="admin-empty">error: ${e.message}</div>`;}
 }
 
 window.changeUsername = async function(uid, oldName){
