@@ -414,7 +414,7 @@
   </div>
 </div>
 
-<div id="bannedOverlay" style="display:none;position:fixed;inset:0;background:#0d0d0d;z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:40px;text-align:center;">
+<div id="bannedOverlay" style="display:none;position:fixed;inset:0;background:#0d0d0d;z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:40px;text-align:center;pointer-events:none;">
   <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;color:var(--red);letter-spacing:-0.02em;">You've been banned</div>
   <div style="font-size:13px;color:var(--text-muted);max-width:400px;line-height:1.7;">You are no longer able to post or reply on this site.</div>
   <div id="banReasonDisplay" style="background:var(--bg3);border:1px solid rgba(255,80,80,0.2);border-radius:12px;padding:14px 20px;font-size:13px;color:var(--text);max-width:400px;display:none;">
@@ -661,17 +661,19 @@ applyLockdown();
 function checkIfBanned(){
   if(isAdmin)return;
   const myNick=(localStorage.getItem('myNick')||'').toLowerCase();
-  if(!myNick)return;
-  const entry=bannedNames.find(b=>(b.name||b)===myNick);
   const overlay=document.getElementById('bannedOverlay');
+  if(!myNick){overlay.style.display='none';overlay.style.pointerEvents='none';return;}
+  const entry=bannedNames.find(b=>(b.name||b)===myNick);
   if(entry){
     overlay.style.display='flex';
+    overlay.style.pointerEvents='all';
     const reasonEl=document.getElementById('banReasonDisplay');
     const reasonText=document.getElementById('banReasonText');
     if(entry.reason){reasonEl.style.display='block';reasonText.textContent=entry.reason;}
     else{reasonEl.style.display='none';}
   } else {
     overlay.style.display='none';
+    overlay.style.pointerEvents='none';
   }
 }
 
