@@ -2,26 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<link rel="icon" type="image/png" href="https://i.postimg.cc/m2pVRV9r/Untitled-presentation-2026-03-16T154735-491.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta property="og:title" content="Uplift">
-<meta property="og:description" content="Advice from real people.">
-<meta property="og:image" content="https://i.postimg.cc/m2pVRV9r/Untitled-presentation-2026-03-16T154735-491.png">
-<meta property="og:url" content="https://muzwt.github.io/uplift/">
-<meta property="og:type" content="website">
-<meta name="theme-color" content="#e8ff47">
-<script>
-// Update OG tags dynamically for shared post links
-(function(){
-  const params = new URLSearchParams(location.search);
-  const p = params.get('p');
-  if(p){
-    const decoded = decodeURIComponent(p);
-    document.querySelector('meta[property="og:description"]').setAttribute('content', decoded);
-    document.querySelector('meta[property="og:title"]').setAttribute('content', 'Uplift — ' + decoded.slice(0,60) + (decoded.length>60?'...':''));
-  }
-})();
-</script>
 <title>Uplift</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -246,30 +227,9 @@
   .modal-confirm-admin:hover{opacity:0.88;}
   .modal-confirm-report{background:var(--red);border:none;color:#fff;font-family:"Syne",sans-serif;font-weight:700;font-size:11px;padding:9px 18px;cursor:pointer;transition:opacity 0.15s;border-radius:8px;}
   .modal-confirm-report:hover{opacity:0.88;}
-  .profile-modal{background:var(--bg3);border:1px solid var(--border);border-radius:20px;width:480px;max-width:95vw;max-height:80vh;overflow-y:auto;overflow-x:hidden;}
-  .profile-header{padding:24px 24px 16px;border-bottom:1px solid var(--border);}
-  .profile-avatar{width:48px;height:48px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:#0d0d0d;margin-bottom:12px;}
-  .profile-username{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--text);display:flex;align-items:center;gap:6px;margin-bottom:4px;}
-  .profile-joined{font-size:11px;color:var(--text-muted);}
-  .profile-stats{display:flex;gap:24px;margin-top:12px;}
-  .profile-stat{display:flex;flex-direction:column;gap:2px;}
-  .profile-stat-num{font-family:'Syne',sans-serif;font-weight:700;font-size:18px;color:var(--text);}
-  .profile-stat-label{font-size:10px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;}
-  .profile-posts{padding:16px 24px;}
-  .profile-posts-title{font-family:'Syne',sans-serif;font-weight:700;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;}
-  .profile-post-item{padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer;}
-  .profile-post-item:last-child{border-bottom:none;}
-  .profile-post-item:hover .profile-post-text{color:var(--accent);}
-  .profile-post-text{font-size:14px;color:var(--text);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color 0.2s;}
-  .profile-post-meta{display:flex;gap:12px;font-size:11px;color:var(--text-dim);}
-  .follow-btn{background:var(--accent);border:none;color:#0d0d0d;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;padding:8px 20px;border-radius:10px;cursor:pointer;transition:opacity 0.15s;}
-  .follow-btn:hover{opacity:0.88;}
-  .follow-btn.following{background:transparent;border:1px solid var(--border);color:var(--text-muted);}
-  .follow-btn.following:hover{border-color:var(--red);color:var(--red);}
-  .profile-close{background:none;border:1px solid var(--border);color:var(--text-muted);font-family:'DM Mono',monospace;font-size:11px;padding:6px 14px;cursor:pointer;border-radius:8px;transition:all 0.2s;float:right;}
-  .profile-close:hover{border-color:#444;color:var(--text);}
-  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg3);border:1px solid var(--border);color:var(--text-muted);font-size:11px;letter-spacing:0.1em;padding:10px 20px;border-radius:10px;transition:transform 0.3s ease;z-index:9000;white-space:nowrap;}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg3);border:1px solid var(--border);color:var(--text-muted);font-size:11px;letter-spacing:0.1em;padding:10px 20px;border-radius:10px;transition:transform 0.3s ease;z-index:400;white-space:nowrap;}
   .toast.show{transform:translateX(-50%) translateY(0);}
+  .loading{text-align:center;color:var(--text-dim);padding:40px;font-size:11px;letter-spacing:0.2em;}
   .empty{text-align:center;color:var(--text-dim);padding:60px 20px;font-family:"Syne",sans-serif;font-weight:600;font-size:16px;}
   footer{padding:48px 0 32px;text-align:center;color:var(--text-dim);font-size:10px;letter-spacing:0.15em;}
 
@@ -319,7 +279,6 @@
       <div class="tagline">Advice from real people.</div>
     </div>
     <div style="display:flex;align-items:center;gap:8px;">
-      <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted);"><span style="width:7px;height:7px;border-radius:50%;background:#4ade80;flex-shrink:0;box-shadow:0 0 6px #4ade80;"></span><span id="onlineNum">1</span> Online</span>
       <div class="notif-wrap">
         <button class="notif-btn" id="notifBtn" onclick="toggleNotifPanel()" title="Notifications">
           <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
@@ -366,7 +325,6 @@
       </label>
     </div>
     <textarea id="confessionText" placeholder="What's on your mind..." maxlength="600" rows="4"></textarea>
-
     <div class="form-footer">
       <span class="char-count"><span id="charCount">0</span>/600</span>
       <button class="submit-btn" id="submitBtn" onclick="submitConfession()">Post it</button>
@@ -380,13 +338,9 @@
     <div class="feed-line"></div>
     <div class="sort-tabs">
       <button class="sort-tab active" id="tab-new" onclick="setSort('new')">New</button>
-      <button class="sort-tab" id="tab-hot" onclick="setSort('hot')">Top</button>
+      <button class="sort-tab" id="tab-hot" onclick="setSort('hot')">Hot</button>
       <button class="sort-tab" id="tab-bookmarks" onclick="setSort('bookmarks')">Saved</button>
     </div>
-  </div>
-  <div style="position:relative;margin-bottom:16px;">
-    <input type="text" id="searchInput" placeholder="Search posts..." oninput="handleSearch(this.value)" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;padding:9px 36px 9px 14px;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
-    <svg style="position:absolute;right:12px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:var(--text-muted);fill:none;stroke-width:2;pointer-events:none;" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
   </div>
 
   <div id="feed"><div class="loading">loading...</div></div>
@@ -603,27 +557,6 @@
 
 <div class="toast" id="toast"></div>
 
-<div class="modal-overlay" id="profileModal">
-  <div class="profile-modal">
-    <div class="profile-header">
-      <button class="profile-close" onclick="closeProfile()">✕</button>
-      <div class="profile-avatar" id="profileAvatar">?</div>
-      <div class="profile-username" id="profileUsername">—</div>
-      <div class="profile-joined" id="profileJoined"></div>
-      <div class="profile-stats">
-        <div class="profile-stat"><div class="profile-stat-num" id="profilePostCount">0</div><div class="profile-stat-label">Posts</div></div>
-        <div class="profile-stat"><div class="profile-stat-num" id="profileLikes">0</div><div class="profile-stat-label">Likes</div></div>
-        <div class="profile-stat"><div class="profile-stat-num" id="profileFollowers">0</div><div class="profile-stat-label">Followers</div></div>
-      </div>
-      <div style="margin-top:14px;" id="profileFollowBtn"></div>
-    </div>
-    <div class="profile-posts">
-      <div class="profile-posts-title">Posts</div>
-      <div id="profilePostsList"><div class="loading">loading...</div></div>
-    </div>
-  </div>
-</div>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore,collection,addDoc,getDocs,updateDoc,deleteDoc,doc,setDoc,onSnapshot,query,orderBy,where,serverTimestamp,increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -657,7 +590,6 @@ let approvalMode = false, filterEnabled = false;
 let customWords = [], bannedNames = [], dailyTopic = '';
 let autoDeleteDays = 0, slowmodeDelay = 30;
 let verifiedUsers = [];
-let following = JSON.parse(localStorage.getItem('following')||'[]');
 
 // localStorage state
 const liked = JSON.parse(localStorage.getItem('liked')||'{}');
@@ -801,15 +733,6 @@ function updateNotifBadge(){
   badge.classList.toggle('visible',unread>0);
 }
 
-function addFollowNotification(confId, username, text){
-  notifications.unshift({id:Date.now(),confId,type:'follow',replyNick:username,replyText:text.slice(0,80),confText:'',time:Date.now(),read:false});
-  if(notifications.length>50) notifications=notifications.slice(0,50);
-  localStorage.setItem('notifications',JSON.stringify(notifications));
-  updateNotifBadge();
-  const badge=document.getElementById('notifBadge');
-  if(badge){badge.classList.remove('pulse');void badge.offsetWidth;badge.classList.add('pulse');}
-}
-
 function addNotification(confId,confText,replyText,replyNick){
   notifications.unshift({id:Date.now(),confId,confText:confText.slice(0,60),replyText:replyText.slice(0,80),replyNick,time:Date.now(),read:false});
   if(notifications.length>50) notifications=notifications.slice(0,50);
@@ -823,24 +746,14 @@ function renderNotifList(){
   const el=document.getElementById('notifList');
   if(!el) return;
   if(!notifications.length){el.innerHTML='<div class="notif-empty">no notifications yet</div>';return;}
-  el.innerHTML=notifications.map(n=>{
-    if(n.type==='follow'){
-      return`<div class="notif-item${n.read?'':' unread'}" onclick="goToNotif('${n.confId}','${n.id}')">
-        <div class="notif-item-top">
-          <span class="notif-item-label">~${esc(n.replyNick)} posted</span>
-          <span class="notif-item-time">${timeAgo({toMillis:()=>n.time})}</span>
-        </div>
-        <div class="notif-item-preview">${esc(n.replyText)}</div>
-      </div>`;
-    }
-    return`<div class="notif-item${n.read?'':' unread'}" onclick="goToNotif('${n.confId}','${n.id}')">
+  el.innerHTML=notifications.map(n=>`
+    <div class="notif-item${n.read?'':' unread'}" onclick="goToNotif('${n.confId}','${n.id}')">
       <div class="notif-item-top">
         <span class="notif-item-label">~${esc(n.replyNick)} replied</span>
         <span class="notif-item-time">${timeAgo({toMillis:()=>n.time})}</span>
       </div>
       <div class="notif-item-preview">${esc(n.replyText)}</div>
-    </div>`;
-  }).join('');
+    </div>`).join('');
 }
 
 window.toggleNotifPanel = function(){
@@ -1012,32 +925,6 @@ function startSlowmode(){
 }
 
 // ── FEED ──────────────────────────────────────────────────────
-let searchQuery = '';
-let activeTag = null;
-
-window.handleSearch = function(val){
-  searchQuery = val.trim().toLowerCase();
-  renderSorted();
-};
-
-window.filterByTag = function(tag){
-  if(activeTag===tag){ activeTag=null; } else { activeTag=tag; }
-  renderSorted();
-};
-
-function updateTagFilterBar(){
-  const bar = document.getElementById('tagFilterBar');
-  if(!bar) return;
-  // Collect all tags from all confessions
-  const allTags = {};
-  allConfessions.forEach(c=>{ if(c.tags) c.tags.forEach(t=>{ allTags[t]=(allTags[t]||0)+1; }); });
-  const sorted = Object.entries(allTags).sort((a,b)=>b[1]-a[1]).slice(0,12);
-  if(!sorted.length){ bar.innerHTML=''; return; }
-  bar.innerHTML = sorted.map(([t,count])=>
-    `<span class="tag${activeTag===t?' active':''}" onclick="filterByTag('${esc(t)}')">#${esc(t)} <span style="opacity:0.6">${count}</span></span>`
-  ).join('');
-}
-
 window.setSort = function(s){
   currentSort=s;
   document.querySelectorAll('.sort-tab').forEach(t=>t.classList.remove('active'));
@@ -1047,20 +934,8 @@ window.setSort = function(s){
 
 function renderSorted(){
   let list=[...allConfessions];
-  if(searchQuery){
-    const q=searchQuery.toLowerCase();
-    list=list.filter(c=>
-      (c.text||'').toLowerCase().includes(q)||
-      (c.nickname||'').toLowerCase().includes(q)||
-      (c.realUsername||'').toLowerCase().includes(q)
-    );
-  }
   if(currentSort==='bookmarks') list=list.filter(c=>bookmarks[c.id]);
-  if(currentSort==='hot'){
-    const weekAgo=Date.now()-7*86400000;
-    list=list.filter(c=>c.createdAt&&c.createdAt.toMillis()>weekAgo);
-    list.sort((a,b)=>((b.likes||0)+(b.replyCount||0)*2)-((a.likes||0)+(a.replyCount||0)*2));
-  }
+  if(currentSort==='hot') list.sort((a,b)=>((b.likes||0)+(b.replyCount||0)*2)-((a.likes||0)+(a.replyCount||0)*2));
   renderFeed(list);
 }
 
@@ -1081,15 +956,14 @@ function confessionCard(conf){
   const hasReports=(conf.reports||0)>0;
   const cls=`confession-card${conf.pinned?' pinned-card':''}${hasReports&&isAdmin?' reported-card':''}${conf.pending?' pending-card':''}`;
   return`<div class="${cls}" id="card-${conf.id}">
-    ${conf.pinned?'<div class="pin-banner">Pinned</div>':''}
+    ${conf.pinned?'<div class="pin-banner">📌 Pinned</div>':''}
     ${conf.pending?'<div class="pending-banner">⏳ Awaiting approval</div>':''}
     <div class="card-body">
       <div class="card-meta">
-        <span class="card-nick" style="cursor:pointer;" onclick="openProfile('${esc(conf.realUsername||conf.nickname||'anonymous')}',event)">~${esc(conf.nickname||'anonymous')}${conf.nickname!=='anonymous'&&verifiedUsers.includes((conf.realUsername||conf.nickname||'').toLowerCase())?'<span class="verified-badge">✓</span>':''}</span>
+        <span class="card-nick">~${esc(conf.nickname||'anonymous')}${verifiedUsers.includes((conf.realUsername||conf.nickname||'').toLowerCase())?'<span class="verified-badge">✓</span>':''}</span>
         <span class="card-time">${timeAgo(conf.createdAt)}</span>
       </div>
       <div class="card-text">${esc(conf.text)}${conf.edited?'<span class="edited-tag">(edited)</span>':''}</div>
-      ${conf.tags&&conf.tags.length?`<div class="tags-row" style="margin-bottom:12px;">${conf.tags.map(t=>`<span class="tag" onclick="filterByTag('${esc(t)}')">#${esc(t)}</span>`).join('')}</div>`:''}
       <div class="card-actions">
         <button class="action-btn${isLiked?' liked':''}" id="like-${conf.id}" onclick="toggleLike('${conf.id}',${conf.likes||0})">
           <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -1104,9 +978,6 @@ function confessionCard(conf){
         </button>
         ${!reported[conf.id]?`<button class="action-btn report-btn" onclick="openReport('${conf.id}')">report</button>`:'<span style="color:var(--text-dim);font-size:11px;">reported</span>'}
         ${isOwner?`<button class="action-btn op-edit" onclick="openEditForm('${conf.id}')">edit</button><button class="action-btn op-delete" onclick="deleteOwnPost('${conf.id}')">delete</button>`:''}
-        <button class="action-btn" onclick="sharePost('${conf.id}')" style="margin-left:auto;">
-          <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-        </button>
         ${hasReports&&isAdmin?`<span class="report-badge">${conf.reports} report${conf.reports>1?'s':''}</span>`:''}
       </div>
     </div>
@@ -1140,26 +1011,8 @@ function autoDeleteOld(list){
 }
 
 // ── CONFESSIONS LISTENER ──────────────────────────────────────
-let knownConfessionIds = new Set();
 onSnapshot(query(collection(db,'confessions'),orderBy('createdAt','desc')),snap=>{
-  const prev = new Set(knownConfessionIds);
   allConfessions=snap.docs.map(d=>({id:d.id,...d.data()}));
-  // Check for new posts from followed users
-  if(currentUser && prev.size > 0){    snap.docs.forEach(d=>{
-      if(!prev.has(d.id)){
-        const data=d.data();
-        // Notify if posted by someone we follow, not anonymous, not pending
-        if(data.realUsername&&
-           data.nickname!=='anonymous'&&
-           !data.pending&&
-           data.realUsername!==currentUser.username&&
-           following.includes(data.realUsername.toLowerCase())){
-          addFollowNotification(d.id, data.realUsername, data.text||'');
-        }
-      }
-    });
-  }
-  knownConfessionIds = new Set(snap.docs.map(d=>d.id));
   autoDeleteOld(allConfessions);
   renderSorted();
 });
@@ -1178,7 +1031,7 @@ window.submitConfession = async function(){
   const btn=document.getElementById('submitBtn');
   btn.disabled=true; btn.textContent='posting...';
   try{
-    const ref=await addDoc(collection(db,'confessions'),{nickname:nick,realUsername:currentUser.username,posterUsername:currentUser.username,anonPost:anonMode,text,likes:0,replyCount:0,reports:0,isAdmin,pending:approvalMode&&!isAdmin,browserId,createdAt:serverTimestamp()});
+    const ref=await addDoc(collection(db,'confessions'),{nickname:nick,realUsername:currentUser.username,posterUsername:currentUser.username,text,likes:0,replyCount:0,reports:0,isAdmin,pending:approvalMode&&!isAdmin,browserId,createdAt:serverTimestamp()});
     myTokens[ref.id]=token;
     localStorage.setItem('myTokens',JSON.stringify(myTokens));
     localStorage.setItem('myNick',nick);
@@ -1229,7 +1082,7 @@ function loadReplies(confId,confNick){
       // OP = reply was made by the original confession author
       const replyAuthor=r.realUsername||r.nickname||'';
       const isOP=confRealAuthor&&replyAuthor&&confRealAuthor===replyAuthor;
-      return`<div class="reply-item"><div class="reply-meta"><span class="reply-nick" style="cursor:pointer;" onclick="openProfile('${esc(r.realUsername||r.nickname||'anonymous')}',event)">~${esc(r.nickname||'anonymous')}${r.nickname!=='anonymous'&&verifiedUsers.includes((r.realUsername||r.nickname||'').toLowerCase())?'<span class="verified-badge">✓</span>':''}${isOP?'<span class="op-badge">OP</span>':''}</span><span class="reply-time">${timeAgo(r.createdAt)}</span></div><div class="reply-text">${esc(r.text)}</div></div>`;
+      return`<div class="reply-item"><div class="reply-meta"><span class="reply-nick">~${esc(r.nickname||'anonymous')}${verifiedUsers.includes((r.realUsername||r.nickname||'').toLowerCase())?'<span class="verified-badge">✓</span>':''}${isOP?'<span class="op-badge">OP</span>':''}</span><span class="reply-time">${timeAgo(r.createdAt)}</span></div><div class="reply-text">${esc(r.text)}</div></div>`;
     }).join('');
   });
 }
@@ -1238,16 +1091,14 @@ window.submitReply = async function(confId){
   if(siteLocked&&!isAdmin){showToast('site is locked');return;}
   if(!currentUser){showAuthScreen();return;}
   if(!isAdmin&&bannedNames.some(b=>(b.name||b)===(currentUser.username||'').toLowerCase())){showToast('you are banned');return;}
-  const conf=allConfessions.find(c=>c.id===confId);
-  const forceAnon=conf&&conf.anonPost&&conf.realUsername===currentUser.username;
-  const forceReal=conf&&conf.anonPost===false&&conf.realUsername===currentUser.username;
-  const nick=(forceAnon||(anonMode&&!forceReal))?'anonymous':filterText(currentUser.username);
+  const nick=anonMode?'anonymous':filterText(currentUser.username);
   const input=document.getElementById(`reply-input-${confId}`);
   const rawText=input.value.trim(); if(!rawText) return;
   const text=filterText(rawText);
   input.value='';
   await addDoc(collection(db,'confessions',confId,'replies'),{nickname:nick,realUsername:currentUser.username,text,isAdmin,createdAt:serverTimestamp()});
   await updateDoc(doc(db,'confessions',confId),{replyCount:increment(1)});
+  // Start watching this confession for future replies
   watchRepliesForConf(confId);
 };
 
@@ -1678,247 +1529,7 @@ window.banNickname=async function(){
   renderBannedList(); showToast(`~${val} banned`);
 };
 
-window.sharePost = function(id){
-  const conf = allConfessions.find(c=>c.id===id);
-  const preview = conf ? encodeURIComponent(conf.text.slice(0,120)) : '';
-  const url = `${location.origin}${location.pathname}?post=${id}&p=${preview}`;
-  if(navigator.clipboard){
-    navigator.clipboard.writeText(url).then(()=>showToast('link copied!'));
-  } else {
-    const el=document.createElement('input');
-    el.value=url; document.body.appendChild(el);
-    el.select(); document.execCommand('copy');
-    document.body.removeChild(el);
-    showToast('link copied!');
-  }
-};
-let currentProfileUser = null;
-const avatarCache = {};
-
-function renderAvatarEl(el, username, avatarUrl){
-  if(avatarUrl){
-    el.innerHTML=`<img src="${esc(avatarUrl)}" onerror="this.parentElement.innerHTML='${(username[0]||'?').toUpperCase()}'">`;
-  } else {
-    el.textContent=(username[0]||'?').toUpperCase();
-  }
-}
-
-window.toggleAvatarEdit = function(){
-  const el=document.getElementById('profileAvatarEdit');
-  if(el.style.display==='none'||!el.innerHTML){
-    el.style.display='block';
-    el.innerHTML=avatarEditHTML();
-  } else {
-    el.style.display='none';
-  }
-};
-
-window.toggleBioEdit = function(){
-  const el=document.getElementById('profileBioEdit');
-  if(el.style.display==='none'||!el.innerHTML){
-    el.style.display='block';
-    el.innerHTML=bioEditHTML(currentUser?.bio||'');
-    setTimeout(()=>document.getElementById('bioInput')?.focus(),50);
-  } else {
-    el.style.display='none';
-  }
-};
-function bioEditHTML(currentBio){
-  return`<div style="margin-bottom:8px;">
-    <div style="font-size:10px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;">Bio</div>
-    <div style="display:flex;gap:6px;">
-      <input type="text" id="bioInput" value="${esc(currentBio||'')}" placeholder="Write a short bio..." class="settings-text-input" style="flex:1;font-size:11px;box-shadow:none!important;" maxlength="120">
-      <button class="settings-save" onclick="saveBio()" style="white-space:nowrap;">Save</button>
-    </div>
-  </div>`;
-}
-
-window.saveBio = async function(){
-  const bio=document.getElementById('bioInput').value.trim();
-  const snap=await getDocs(query(collection(db,'users'),where('username','==',currentUser.username.toLowerCase())));
-  if(!snap.empty) await updateDoc(snap.docs[0].ref,{bio});
-  currentUser.bio=bio;
-  sessionStorage.setItem('currentUser',JSON.stringify(currentUser));
-  document.getElementById('profileBioDisplay').textContent=bio;
-  document.getElementById('profileBioEdit').style.display='none';
-  showToast('bio saved!');
-};
-
-window.toggleFollowingList = function(){
-  const sec=document.getElementById('followingListSection');
-  sec.style.display=sec.style.display==='none'?'block':'none';
-};
-
-function avatarEditHTML(){
-  return`<div style="margin-bottom:12px;">
-    <div style="font-size:10px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;">Profile picture URL</div>
-    <div style="display:flex;gap:6px;margin-bottom:6px;">
-      <input type="text" id="avatarUrlInput" placeholder="Paste image URL..." class="settings-text-input" style="flex:1;font-size:11px;box-shadow:none!important;">
-      <button class="settings-save" onclick="saveAvatar()" style="white-space:nowrap;">Save</button>
-    </div>
-    ${currentUser?.avatarUrl?`<button onclick="removeAvatar()" style="background:none;border:none;color:var(--text-dim);font-size:11px;cursor:pointer;padding:0;font-family:'DM Mono',monospace;">remove photo</button>`:''}
-  </div>`;
-}
-
-window.saveAvatar = async function(){
-  const url=document.getElementById('avatarUrlInput').value.trim();
-  if(!url){showToast('enter an image URL');return;}
-  const snap=await getDocs(query(collection(db,'users'),where('username','==',currentUser.username.toLowerCase())));
-  if(!snap.empty) await updateDoc(snap.docs[0].ref,{avatarUrl:url});
-  currentUser.avatarUrl=url;
-  sessionStorage.setItem('currentUser',JSON.stringify(currentUser));
-  avatarCache[currentUser.username.toLowerCase()]=url;
-  applyUserUI();
-  document.getElementById('avatarUrlInput').value='';
-  document.getElementById('profileAvatarEdit').style.display='none';
-  renderAvatarEl(document.getElementById('profileAvatar'),currentUser.username,url);
-  showToast('profile picture updated!');
-};
-
-window.removeAvatar = async function(){
-  const snap=await getDocs(query(collection(db,'users'),where('username','==',currentUser.username.toLowerCase())));
-  if(!snap.empty) await updateDoc(snap.docs[0].ref,{avatarUrl:''});
-  currentUser.avatarUrl='';
-  sessionStorage.setItem('currentUser',JSON.stringify(currentUser));
-  avatarCache[currentUser.username.toLowerCase()]='';
-  applyUserUI();
-  document.getElementById('profileAvatarEdit').innerHTML=avatarEditHTML();
-  renderAvatarEl(document.getElementById('profileAvatar'),currentUser.username,'');
-  showToast('profile picture removed');
-};
-
-window.openProfile = async function(username, e){
-  if(e) e.stopPropagation();
-  if(!username||username==='anonymous') return;
-  currentProfileUser = username.toLowerCase();
-  const isOwnProfile = currentUser && username.toLowerCase()===currentUser.username.toLowerCase();
-  document.getElementById('profileModal').classList.add('active');
-  document.getElementById('profileBioDisplay').textContent='';
-  document.getElementById('profileBioEdit').innerHTML='';
-  document.getElementById('profileAvatarPencil').style.display='none';
-  document.getElementById('profileBioPencil').style.display='none';
-  document.getElementById('profileFollowingCount').textContent='0';
-  document.getElementById('followingListSection').style.display='none';
-  renderAvatarEl(document.getElementById('profileAvatar'),username,'');
-  document.getElementById('profileAvatarEdit').innerHTML='';
-  document.getElementById('profileUsername').innerHTML='~'+esc(username)+(verifiedUsers.includes(username.toLowerCase())?'<span class="verified-badge">✓</span>':'');
-  document.getElementById('profileJoined').textContent='';
-  document.getElementById('profilePostCount').textContent='0';
-  document.getElementById('profileLikes').textContent='0';
-  document.getElementById('profileFollowers').textContent='0';
-
-  if(isOwnProfile){
-    // Show pencil icons
-    const avatarPencil=document.getElementById('profileAvatarPencil');
-    const bioPencil=document.getElementById('profileBioPencil');
-    if(avatarPencil) avatarPencil.style.display='flex';
-    if(bioPencil) bioPencil.style.display='inline-flex';
-  } else {
-    const avatarPencil=document.getElementById('profileAvatarPencil');
-    const bioPencil=document.getElementById('profileBioPencil');
-    if(avatarPencil) avatarPencil.style.display='none';
-    if(bioPencil) bioPencil.style.display='none';
-  }
-  if(currentUser&&!isOwnProfile){
-    const isFollowing=following.includes(username.toLowerCase());
-    followBtnEl.innerHTML=`<button class="follow-btn${isFollowing?' following':''}" id="followBtn" onclick="toggleFollow('${username.toLowerCase()}')">${isFollowing?'Following':'Follow'}</button>`;
-  } else {
-    followBtnEl.innerHTML='';
-  }
-
-  // Show following list
-  const followingListItems=document.getElementById('followingListItems');
-  if(isOwnProfile && following.length){
-    document.getElementById('profileFollowingCount').textContent=following.length;
-    followingListItems.innerHTML=following.map(f=>`
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
-        <span class="card-nick" style="cursor:pointer;" onclick="openProfile('${esc(f)}',event)">~${esc(f)}</span>
-        <button class="admin-btn-delete-reply" onclick="toggleFollow('${esc(f)}')">Unfollow</button>
-      </div>`).join('');
-  } else if(isOwnProfile){
-    document.getElementById('profileFollowingCount').textContent='0';
-    followingListItems.innerHTML='<div style="color:var(--text-dim);font-size:12px;">not following anyone yet</div>';
-  }
-
-  // Get user info + avatar from Firebase
-  try{
-    const userSnap=await getDocs(query(collection(db,'users'),where('username','==',username.toLowerCase())));
-    if(!userSnap.empty){
-      const u=userSnap.docs[0].data();
-      if(u.createdAt) document.getElementById('profileJoined').textContent='Joined '+new Date(u.createdAt.toMillis()).toLocaleDateString();
-      document.getElementById('profileFollowers').textContent=u.followers||0;
-      if(u.bio){
-        document.getElementById('profileBioDisplay').textContent=u.bio;
-      }
-      if(isOwnProfile){
-        currentUser.bio=u.bio||'';
-        sessionStorage.setItem('currentUser',JSON.stringify(currentUser));
-        document.getElementById('profileBioEdit').innerHTML=bioEditHTML(u.bio||'');
-      }
-      if(u.avatarUrl){
-        avatarCache[username.toLowerCase()]=u.avatarUrl;
-        renderAvatarEl(document.getElementById('profileAvatar'),username,u.avatarUrl);
-        // Also update currentUser if it's our profile
-        if(currentUser&&username.toLowerCase()===currentUser.username.toLowerCase()&&!currentUser.avatarUrl){
-          currentUser.avatarUrl=u.avatarUrl;
-          sessionStorage.setItem('currentUser',JSON.stringify(currentUser));
-          applyUserUI();
-        }
-      }
-    }
-  }catch(e){}
-
-  // Get their posts
-  const posts=allConfessions.filter(c=>c.realUsername===username&&c.nickname!=='anonymous'&&!c.pending);
-  const totalLikes=posts.reduce((sum,c)=>sum+(c.likes||0),0);
-  document.getElementById('profilePostCount').textContent=posts.length;
-  document.getElementById('profileLikes').textContent=totalLikes;
-
-  if(!posts.length){
-    document.getElementById('profilePostsList').innerHTML='<div style="color:var(--text-dim);font-size:13px;padding:8px 0;">no public posts yet</div>';
-    return;
-  }
-  document.getElementById('profilePostsList').innerHTML=posts.map(p=>`
-    <div class="profile-post-item" onclick="closeProfile();setTimeout(()=>{const c=document.getElementById('card-${p.id}');if(c)c.scrollIntoView({behavior:'smooth',block:'center'})},100)">
-      <div class="profile-post-text">${esc(p.text)}</div>
-      <div class="profile-post-meta">
-        <span style="display:flex;align-items:center;gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> ${p.likes||0}</span>
-        <span style="display:flex;align-items:center;gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> ${p.replyCount||0}</span>
-        <span>${timeAgo(p.createdAt)}</span>
-      </div>
-    </div>`).join('');
-};
-
-window.toggleFollow = async function(username){
-  if(!currentUser) return;
-  const isFollowing=following.includes(username);
-  if(isFollowing){
-    following=following.filter(f=>f!==username);
-    const snap=await getDocs(query(collection(db,'users'),where('username','==',username)));
-    if(!snap.empty) await updateDoc(snap.docs[0].ref,{followers:increment(-1)});
-    showToast('unfollowed ~'+username);
-  } else {
-    following.push(username);
-    const snap=await getDocs(query(collection(db,'users'),where('username','==',username)));
-    if(!snap.empty) await updateDoc(snap.docs[0].ref,{followers:increment(1)});
-    showToast('following ~'+username+'!');
-  }
-  localStorage.setItem('following',JSON.stringify(following));
-  const btn=document.getElementById('followBtn');
-  if(btn){ btn.classList.toggle('following',!isFollowing); btn.textContent=isFollowing?'Follow':'Following'; }
-  document.getElementById('profileFollowingCount').textContent=following.length;
-  const snap2=await getDocs(query(collection(db,'users'),where('username','==',username)));
-  if(!snap2.empty) document.getElementById('profileFollowers').textContent=snap2.docs[0].data().followers||0;
-};
-
-window.closeProfile=function(){
-  document.getElementById('profileModal').classList.remove('active');
-  currentProfileUser=null;
-};
-
-document.getElementById('profileModal').addEventListener('click',function(e){
-  if(e.target===this) closeProfile();
-});
+// ── INIT ──────────────────────────────────────────────────────
 document.addEventListener('click',e=>{
   const notifPanel=document.getElementById('notifPanel');
   const notifBtn=document.getElementById('notifBtn');
@@ -1935,103 +1546,10 @@ document.addEventListener('keydown',function(e){
   if(e.key==='Enter'&&e.target.classList.contains('reply-input')) submitReply(e.target.id.replace('reply-input-',''));
 });
 
-// ── ONLINE PRESENCE ───────────────────────────────────────────
-function startPresence(){
-  if(!browserId) return;
-  const presenceRef = doc(db,'presence',browserId);
-  const heartbeat = () => setDoc(presenceRef,{uid:browserId,lastSeen:Date.now()},{merge:true});
-  heartbeat();
-  setInterval(heartbeat, 20000);
-  window.addEventListener('beforeunload',()=>deleteDoc(presenceRef));
-  onSnapshot(collection(db,'presence'),snap=>{
-    const cutoff = Date.now()-60000;
-    const active = snap.docs.filter(d=>{
-      const t = d.data().lastSeen;
-      return typeof t === 'number' && t > cutoff;
-    });
-    const el=document.getElementById('onlineNum');
-    if(el) el.textContent=Math.max(1,active.length);
-  });
-}
-
 updateNotifBadge();
 watchOwnedReplies();
 if(currentUser){ applyUserUI(); } else { showAuthScreen(); }
-startPresence();
 
-// Handle shared post link
-const sharedPostId = new URLSearchParams(location.search).get('post');
-if(sharedPostId){
-  const check = setInterval(()=>{
-    const card = document.getElementById(`card-${sharedPostId}`);
-    if(card){
-      clearInterval(check);
-      card.scrollIntoView({behavior:'smooth', block:'center'});
-      card.style.borderColor='var(--accent)';
-      setTimeout(()=>card.style.borderColor='',2500);
-    }
-  }, 300);
-}
-
-
-// ── PROFILES ──────────────────────────────────────────────────
-
-window.openProfile = async function(username, e){
-  if(e) e.stopPropagation();
-  if(!username||username==='anonymous') return;
-  currentProfileUser = username.toLowerCase();
-  document.getElementById('profileModal').classList.add('active');
-  document.getElementById('profilePostsList').innerHTML='<div class="loading">loading...</div>';
-  document.getElementById('profileAvatar').textContent=username[0].toUpperCase();
-  document.getElementById('profileUsername').innerHTML='~'+esc(username)+(verifiedUsers.includes(username.toLowerCase())?'<span class="verified-badge">✓</span>':'');
-  document.getElementById('profileJoined').textContent='';
-  document.getElementById('profilePostCount').textContent='0';
-  document.getElementById('profileLikes').textContent='0';
-  document.getElementById('profileFollowers').textContent='0';
-
-  const followBtnEl=document.getElementById('profileFollowBtn');
-  if(currentUser&&username.toLowerCase()!==currentUser.username.toLowerCase()){
-    const isFollowing=following.includes(username.toLowerCase());
-    followBtnEl.innerHTML=`<button class="follow-btn${isFollowing?' following':''}" id="followBtn" onclick="toggleFollow('${username.toLowerCase()}')">${isFollowing?'Following':'Follow'}</button>`;
-  } else { followBtnEl.innerHTML=''; }
-
-  try{
-    const userSnap=await getDocs(query(collection(db,'users'),where('username','==',username.toLowerCase())));
-    if(!userSnap.empty){
-      const u=userSnap.docs[0].data();
-      if(u.createdAt) document.getElementById('profileJoined').textContent='Joined '+new Date(u.createdAt.toMillis()).toLocaleDateString();
-      document.getElementById('profileFollowers').textContent=u.followers||0;
-    }
-  }catch(e){}
-
-  const posts=allConfessions.filter(c=>c.realUsername===username&&c.nickname!=='anonymous'&&!c.pending);
-  const totalLikes=posts.reduce((sum,c)=>sum+(c.likes||0),0);
-  document.getElementById('profilePostCount').textContent=posts.length;
-  document.getElementById('profileLikes').textContent=totalLikes;
-
-  if(!posts.length){
-    document.getElementById('profilePostsList').innerHTML='<div style="color:var(--text-dim);font-size:13px;padding:8px 0;">no public posts yet</div>';
-    return;
-  }
-  document.getElementById('profilePostsList').innerHTML=posts.map(p=>`
-    <div class="profile-post-item" onclick="closeProfile();setTimeout(()=>{const c=document.getElementById('card-${p.id}');if(c)c.scrollIntoView({behavior:'smooth',block:'center'})},100)">
-      <div class="profile-post-text">${esc(p.text)}</div>
-      <div class="profile-post-meta">
-        <span style="display:flex;align-items:center;gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> ${p.likes||0}</span>
-        <span style="display:flex;align-items:center;gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> ${p.replyCount||0}</span>
-        <span>${timeAgo(p.createdAt)}</span>
-      </div>
-    </div>`).join('');
-};
-
-window.closeProfile=function(){
-  document.getElementById('profileModal').classList.remove('active');
-  currentProfileUser=null;
-};
-
-document.getElementById('profileModal').addEventListener('click',function(e){
-  if(e.target===this) closeProfile();
-});
 </script>
 </body>
 </html>
