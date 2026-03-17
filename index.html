@@ -236,9 +236,7 @@
   .modal-confirm-report:hover{opacity:0.88;}
   .profile-modal{background:var(--bg3);border:1px solid var(--border);border-radius:20px;width:480px;max-width:95vw;max-height:80vh;overflow-y:auto;overflow-x:hidden;}
   .profile-header{padding:24px 24px 16px;border-bottom:1px solid var(--border);}
-  .profile-avatar{width:64px;height:64px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:24px;color:#0d0d0d;margin-bottom:12px;overflow:hidden;flex-shrink:0;}
-  .profile-avatar img{width:64px;height:64px;object-fit:cover;border-radius:50%;display:block;flex-shrink:0;}
-  .user-avatar img{width:26px;height:26px;object-fit:cover;border-radius:50%;display:block;}
+  .profile-avatar{width:48px;height:48px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:#0d0d0d;margin-bottom:12px;}
   .profile-username{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--text);display:flex;align-items:center;gap:6px;margin-bottom:4px;}
   .profile-joined{font-size:11px;color:var(--text-muted);}
   .profile-stats{display:flex;gap:24px;margin-top:12px;}
@@ -260,7 +258,10 @@
   .profile-close:hover{border-color:#444;color:var(--text);}
   .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg3);border:1px solid var(--border);color:var(--text-muted);font-size:11px;letter-spacing:0.1em;padding:10px 20px;border-radius:10px;transition:transform 0.3s ease;z-index:9000;white-space:nowrap;}
   .toast.show{transform:translateX(-50%) translateY(0);}
-  .loading{text-align:center;color:var(--text-dim);padding:40px;font-size:11px;letter-spacing:0.2em;}
+  .tag{display:inline-block;background:var(--accent-dim);border:1px solid rgba(232,255,71,0.2);color:var(--accent);font-size:10px;padding:2px 8px;border-radius:6px;cursor:pointer;transition:background 0.15s;font-family:'DM Mono',monospace;letter-spacing:0.05em;}
+  .tag:hover{background:rgba(232,255,71,0.15);}
+  .tag.active{background:var(--accent);color:#0d0d0d;}
+  .tags-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
   .empty{text-align:center;color:var(--text-dim);padding:60px 20px;font-family:"Syne",sans-serif;font-weight:600;font-size:16px;}
   footer{padding:48px 0 32px;text-align:center;color:var(--text-dim);font-size:10px;letter-spacing:0.15em;}
 
@@ -357,6 +358,9 @@
       </label>
     </div>
     <textarea id="confessionText" placeholder="What's on your mind..." maxlength="600" rows="4"></textarea>
+    <div style="margin-bottom:14px;">
+      <input type="text" id="tagsInput" placeholder="tags: relationships, school, work" style="width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);border-radius:0;color:var(--text-muted);font-size:12px;padding:4px 0;box-shadow:none!important;" onfocus="this.style.borderBottomColor='var(--accent)'" onblur="this.style.borderBottomColor='var(--border)'">
+    </div>
     <div class="form-footer">
       <span class="char-count"><span id="charCount">0</span>/600</span>
       <button class="submit-btn" id="submitBtn" onclick="submitConfession()">Post it</button>
@@ -375,6 +379,7 @@
     </div>
   </div>
 
+  <div id="tagFilterBar" class="tags-row" style="margin-bottom:16px;"></div>
   <div id="feed"><div class="loading">loading...</div></div>
   <footer>uplift &mdash; no logs, no traces</footer>
 </div>
@@ -714,7 +719,7 @@ window.doLogin = async function(){
     if(snap.empty){err.textContent='username not found';return;}
     const userData=snap.docs[0].data();
     if(userData.password!==hashPassword(password)){err.textContent='incorrect password';return;}
-    currentUser={username:userData.username,uid:snap.docs[0].id,avatarUrl:userData.avatarUrl||''};
+    currentUser={username:userData.username,uid:snap.docs[0].id};
     sessionStorage.setItem('currentUser',JSON.stringify(currentUser));
     localStorage.setItem('myNick',currentUser.username);
     hideAuthScreen();
@@ -770,12 +775,7 @@ window.toggleAnonMode = function(){
 
 function applyUserUI(){
   if(!currentUser) return;
-  const avatarEl=document.getElementById('userAvatar');
-  if(currentUser.avatarUrl){
-    avatarEl.innerHTML=`<img src="${currentUser.avatarUrl}" onerror="this.parentElement.innerHTML='${(currentUser.username[0]||'?').toUpperCase()}'">`;
-  } else {
-    avatarEl.textContent=(currentUser.username[0]||'?').toUpperCase();
-  }
+  document.getElementById('userAvatar').textContent=(currentUser.username[0]||'?').toUpperCase();
   document.getElementById('userNameDisplay').textContent=currentUser.username;
   document.getElementById('menuUsername').textContent='@'+currentUser.username;
   document.getElementById('anonBox').classList.remove('on');
@@ -1003,7 +1003,26 @@ function startSlowmode(){
 }
 
 // ── FEED ──────────────────────────────────────────────────────
-window.setSort = function(s){
+let activeTag = null;
+
+window.filterByTag = function(tag){
+  if(activeTag===tag){ activeTag=null; } else { activeTag=tag; }
+  renderSorted();
+  updateTagFilterBar();
+};
+
+function updateTagFilterBar(){
+  const bar = document.getElementById('tagFilterBar');
+  if(!bar) return;
+  // Collect all tags from all confessions
+  const allTags = {};
+  allConfessions.forEach(c=>{ if(c.tags) c.tags.forEach(t=>{ allTags[t]=(allTags[t]||0)+1; }); });
+  const sorted = Object.entries(allTags).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  if(!sorted.length){ bar.innerHTML=''; return; }
+  bar.innerHTML = sorted.map(([t,count])=>
+    `<span class="tag${activeTag===t?' active':''}" onclick="filterByTag('${esc(t)}')">#${esc(t)} <span style="opacity:0.6">${count}</span></span>`
+  ).join('');
+}
   currentSort=s;
   document.querySelectorAll('.sort-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById(`tab-${s}`).classList.add('active');
@@ -1012,6 +1031,7 @@ window.setSort = function(s){
 
 function renderSorted(){
   let list=[...allConfessions];
+  if(activeTag) list=list.filter(c=>c.tags&&c.tags.includes(activeTag));
   if(currentSort==='bookmarks') list=list.filter(c=>bookmarks[c.id]);
   if(currentSort==='hot'){
     const weekAgo=Date.now()-7*86400000;
@@ -1046,6 +1066,7 @@ function confessionCard(conf){
         <span class="card-time">${timeAgo(conf.createdAt)}</span>
       </div>
       <div class="card-text">${esc(conf.text)}${conf.edited?'<span class="edited-tag">(edited)</span>':''}</div>
+      ${conf.tags&&conf.tags.length?`<div class="tags-row" style="margin-bottom:12px;">${conf.tags.map(t=>`<span class="tag" onclick="filterByTag('${esc(t)}')">#${esc(t)}</span>`).join('')}</div>`:''}
       <div class="card-actions">
         <button class="action-btn${isLiked?' liked':''}" id="like-${conf.id}" onclick="toggleLike('${conf.id}',${conf.likes||0})">
           <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -1101,8 +1122,7 @@ onSnapshot(query(collection(db,'confessions'),orderBy('createdAt','desc')),snap=
   const prev = new Set(knownConfessionIds);
   allConfessions=snap.docs.map(d=>({id:d.id,...d.data()}));
   // Check for new posts from followed users
-  if(currentUser && prev.size > 0){
-    snap.docs.forEach(d=>{
+  if(currentUser && prev.size > 0){    snap.docs.forEach(d=>{
       if(!prev.has(d.id)){
         const data=d.data();
         // Notify if posted by someone we follow, not anonymous, not pending
@@ -1119,6 +1139,7 @@ onSnapshot(query(collection(db,'confessions'),orderBy('createdAt','desc')),snap=
   knownConfessionIds = new Set(snap.docs.map(d=>d.id));
   autoDeleteOld(allConfessions);
   renderSorted();
+  updateTagFilterBar();
 });
 
 // ── ACTIONS ───────────────────────────────────────────────────
@@ -1127,6 +1148,8 @@ window.submitConfession = async function(){
   if(!isAdmin&&slowmodeDelay>0&&Date.now()-lastPostTime<slowmodeDelay*1000) return;
   if(!currentUser){showAuthScreen();return;}
   if(!isAdmin&&bannedNames.some(b=>(b.name||b)===(currentUser.username||'').toLowerCase())){showToast('you are banned');return;}
+  const rawTags = document.getElementById('tagsInput').value;
+  const tags = rawTags.split(',').map(t=>t.trim().toLowerCase().replace(/[^a-z0-9]/g,'')).filter(Boolean).slice(0,5);
   const nick=anonMode?'anonymous':filterText(currentUser.username);
   const rawText=document.getElementById('confessionText').value.trim();
   if(!rawText) return;
@@ -1140,6 +1163,7 @@ window.submitConfession = async function(){
     localStorage.setItem('myTokens',JSON.stringify(myTokens));
     localStorage.setItem('myNick',nick);
     document.getElementById('confessionText').value='';
+    document.getElementById('tagsInput').value='';
     document.getElementById('charCount').textContent='0';
     showToast(approvalMode&&!isAdmin?'submitted — awaiting approval':'confession posted');
     startSlowmode();
